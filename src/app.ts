@@ -17,8 +17,10 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {
 });
 
 const getTweets = require("../routes/getTweets");
-
 app.use("/getTweets", getTweets);
+
+const saveTweets = require("../routes/saveTweets");
+app.use("/saveTweets", saveTweets);
 
 // app.get("/tweets", async (req: Request, res: Response): Promise<Response> => {
 //   const allTweets: Tweets[] = await Tweets.findAll();
