@@ -1,4 +1,5 @@
 import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { IntegerDataType } from "sequelize/types";
 
 @Table({
   timestamps: false,
@@ -8,10 +9,11 @@ import { Table, Column, Model, DataType } from "sequelize-typescript";
 })
 export class Tweets extends Model {
   @Column({
-    type: DataType.STRING,
-    allowNull: false,
+    type: DataType.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
   })
-  number!: string;
+  number!: IntegerDataType;
 
   @Column({
     type: DataType.STRING,
