@@ -1,6 +1,4 @@
-import { table } from "console";
-import express, { Request, Response, NextFunction, Router } from "express";
-import { AutoIncrement } from "sequelize-typescript";
+import express, { Request, Response, NextFunction } from "express";
 import sequelize from "../models";
 import { Tweets } from "../models/tweets";
 

@@ -1,6 +1,5 @@
 import { Sequelize } from "sequelize-typescript";
 import { config } from "../config/config";
-import { Order } from "./order";
 import { Tweets } from "./tweets";
 
 const sequelize = new Sequelize({
