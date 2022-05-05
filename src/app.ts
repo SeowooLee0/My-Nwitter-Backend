@@ -20,6 +20,9 @@ app.use("/getTweets", getTweets);
 const saveTweets = require("../routes/saveTweets");
 app.use("/saveTweets", saveTweets);
 
+const register = require("../routes/register");
+app.use("/register", register);
+
 app.listen("1234", async () => {
   console.log(`
   ################################################
