@@ -23,6 +23,9 @@ app.use("/saveTweets", saveTweets);
 const register = require("../routes/register");
 app.use("/register", register);
 
+const login = require("../routes/login");
+app.use("/login", login);
+
 app.listen("1234", async () => {
   console.log(`
   ################################################
