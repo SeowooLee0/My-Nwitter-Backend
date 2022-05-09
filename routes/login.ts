@@ -38,7 +38,12 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       });
     };
 
-    res.json({ accessToken, refreshToken });
+    res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+      })
+      .status(200)
+      .json({ accessToken });
   } catch (err: any) {
     return res.status(400).send({ err: err.message });
   }
