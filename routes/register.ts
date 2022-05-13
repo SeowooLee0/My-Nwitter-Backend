@@ -1,6 +1,4 @@
 import express, { Request, Response, NextFunction } from "express";
-import { where } from "sequelize/types";
-import sequelize from "../models";
 import { Users } from "../models/user";
 const bcrypt = require("bcrypt");
 

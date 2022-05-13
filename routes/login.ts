@@ -1,8 +1,4 @@
-import e from "express";
 import express, { Request, Response, NextFunction } from "express";
-import { access } from "fs";
-import { where } from "sequelize/types";
-import sequelize from "../models";
 import { Users } from "../models/user";
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -11,6 +7,18 @@ const router = express.Router();
 
 router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
+  const generateAccessToken = (email: any) => {
+    return jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "1m",
+    });
+  };
+
+  // refersh token을 secret key  기반으로 생성
+  const generateRefreshToken = (email: any) => {
+    return jwt.sign({ email }, process.env.REFRESH_TOKEN_SECRET, {
+      expiresIn: "1m",
+    });
+  };
 
   try {
     const user = await Users.findOne({
@@ -26,27 +34,62 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       return res.status(400).send("패스워드를 제대로 입력하세요");
     }
 
-    const accessToken = () => {
-      return jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "15m",
-      });
-    };
-
-    const refreshToken = () => {
-      return jwt.sign({ email: email }, process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: "180 days",
-      });
-    };
+    let accessToken = generateAccessToken(email);
+    let refreshToken = generateRefreshToken(email);
 
     res
       .cookie("refreshToken", refreshToken, {
+        secure: true,
         httpOnly: true,
       })
       .status(200)
-      .json({ accessToken });
+      .json({ accessToken, message: "ok" });
   } catch (err: any) {
     return res.status(400).send({ err: err.message });
   }
 });
+
+// const authenticateAccessToken = (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ) => {
+//   let authHeader = req.headers["Authorization"];
+//   let token = authHeader && authHeader.split();
+//   console.log(authHeader);
+//   jwt.verify(
+//     token,
+//     process.env.ACCESS_TOKEN_SECRET,
+//     async (err: any, data: any) => {
+//       if (err) {
+//         //해독할 시 에러..(해독할 수 없는 것)
+//         res.status(400).json({
+//           data: null,
+//           message: "invalid access token",
+//         });
+//       } else {
+//         const userInfo = await Users.findOne({
+//           where: { email: data.email }, //해독하여 얻은 payload의 userId 속성.
+//         });
+//         if (!userInfo) {
+//           // 일치하는 유저가 없을 경우
+//           res.status(400).json({
+//             data: null,
+//             message: "access token has been tempered",
+//           });
+//         } else {
+//           // 일치하는 유저가 있을 경우 필요한 데이터(id, userId, email, createdAt, updatedAt)를 응답에 담아 반환합니다.
+//           const { id, email, createdAt, updatedAt } = userInfo;
+//           res.status(200).json({
+//             data: {
+//               userInfo: { id, email, createdAt, updatedAt },
+//             },
+//             message: "ok",
+//           });
+//         }
+//       }
+//     }
+//   );
+// };
 
 module.exports = router;
