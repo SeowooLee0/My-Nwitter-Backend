@@ -19,6 +19,12 @@ export class Tweets extends Model {
     type: DataType.STRING,
     allowNull: false,
   })
+  email!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
   content!: string;
 
   @Column({

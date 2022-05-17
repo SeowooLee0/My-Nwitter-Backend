@@ -4,7 +4,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 
 module.exports.verifyAccessToken = (
-  req: Request,
+  req: any,
   res: Response,
   next: NextFunction
 ) => {
@@ -12,8 +12,8 @@ module.exports.verifyAccessToken = (
   const token = authorization.split("Bearer ")[1];
 
   try {
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    return next();
+    let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    req.email = decoded.email;
   } catch (error: any) {
     console.log(error);
     if (error.name === "TokenExpiredError") {
@@ -27,4 +27,5 @@ module.exports.verifyAccessToken = (
       message: "invalid access token",
     });
   }
+  next();
 };

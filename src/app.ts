@@ -4,6 +4,7 @@ import { Tweets } from "../models/tweets";
 import bodyParser from "body-parser";
 import cookiePaser from "cookie-parser";
 import cors from "cors";
+const { verifyAccessToken } = require("../middleware/verifyAccessToken");
 
 const app = express();
 
@@ -34,8 +35,8 @@ app.use("/login", login);
 const refreshTokenRequest = require("../routes/refreshTokenRequest");
 app.use("/refreshTokenRequest", refreshTokenRequest);
 
-// const accessChecker = require("../routes/accessChecker");
-// app.use("/accessChecker", accessChecker);
+const logout = require("../routes/logout");
+app.use("/logout", logout);
 
 app.listen("1234", async () => {
   console.log(`

@@ -7,8 +7,9 @@ const router = express.Router();
 router.post(
   "/",
   verifyAccessToken,
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: any, res: Response, next: NextFunction) => {
     await Tweets.create({
+      email: req.email,
       content: req.body.content,
       write_date: sequelize.literal(`now()`),
     }).then((result) => {
