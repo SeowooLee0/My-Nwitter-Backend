@@ -9,12 +9,13 @@ module.exports.verifyRefreshToken = (
   next: NextFunction
 ) => {
   const token = req.cookies.refreshToken;
-
+  let decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
   try {
     jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
     req.token = "refresh ok";
+
+    req.email = decoded.email;
   } catch (error: any) {
-    // console.log(erro
     req.token = "login again";
   }
   next();

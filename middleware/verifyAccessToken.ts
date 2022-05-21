@@ -1,6 +1,4 @@
 import express, { Request, Response, NextFunction } from "express";
-import { Users } from "../models/user";
-const router = express.Router();
 const jwt = require("jsonwebtoken");
 
 module.exports.verifyAccessToken = (
