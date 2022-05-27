@@ -1,5 +1,16 @@
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  Sequelize,
+} from "sequelize-typescript";
 import { IntegerDataType } from "sequelize/types";
+import sequelize from ".";
+
+interface Tag {
+  tag: string;
+}
 
 @Table({
   timestamps: false,
@@ -26,6 +37,12 @@ export class Tweets extends Model {
     allowNull: false,
   })
   content!: string;
+
+  @Column({
+    type: DataType.JSON,
+    allowNull: true,
+  })
+  tag!: string;
 
   @Column({
     type: DataType.STRING,

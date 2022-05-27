@@ -5,6 +5,7 @@ import bodyParser from "body-parser";
 import cookiePaser from "cookie-parser";
 import cors from "cors";
 const { verifyAccessToken } = require("../middleware/verifyAccessToken");
+const { Op } = require("sequelize");
 
 const app = express();
 
@@ -19,6 +20,18 @@ app.use(bodyParser.json());
 app.use(cookiePaser());
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {});
+
+app.get("/tag", async (req: Request, res: Response): Promise<Response> => {
+  const { tag } = req.query;
+
+  const listInfo: Tweets[] = await Tweets.findAll({
+    where: {
+      tag: { [Op.like]: [`%${tag}%`] },
+    },
+  });
+
+  return res.status(200).json({ data: listInfo });
+});
 
 const getTweets = require("../routes/getTweets");
 app.use("/getTweets", getTweets);

@@ -16,6 +16,7 @@ router.post(
       await Tweets.create({
         email: req.email,
         content: req.body.content,
+        tag: req.body.tag,
         write_date: sequelize.literal(`now()`),
       }).then((result) => {
         res.status(201).json(result);
