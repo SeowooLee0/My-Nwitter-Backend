@@ -24,13 +24,13 @@ app.get("/", (req: Request, res: Response, next: NextFunction) => {});
 app.get("/tag", async (req: Request, res: Response): Promise<Response> => {
   const { tag } = req.query;
 
-  const listInfo: Tweets[] = await Tweets.findAll({
+  const selectTag: Tweets[] = await Tweets.findAll({
     where: {
       tag: { [Op.like]: [`%${tag}%`] },
     },
   });
 
-  return res.status(200).json({ data: listInfo });
+  return res.status(200).json({ data: selectTag });
 });
 
 const getTweets = require("../routes/getTweets");
