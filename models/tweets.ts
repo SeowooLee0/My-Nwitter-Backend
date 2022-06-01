@@ -40,7 +40,7 @@ export class Tweets extends Model {
 
   @Column({
     type: DataType.JSON,
-    allowNull: true,
+    allowNull: false,
   })
   tag!: string;
 

@@ -21,17 +21,20 @@ app.use(cookiePaser());
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {});
 
-app.get("/tag", async (req: Request, res: Response): Promise<Response> => {
-  const { tag } = req.query;
+app.get(
+  "/tag/:tagId",
+  async (req: Request, res: Response): Promise<Response> => {
+    const { tagId } = req.params;
 
-  const selectTag: Tweets[] = await Tweets.findAll({
-    where: {
-      tag: { [Op.like]: [`%${tag}%`] },
-    },
-  });
+    const selectTag: Tweets[] = await Tweets.findAll({
+      where: {
+        tag: { [Op.like]: [`%${tagId}%`] },
+      },
+    });
 
-  return res.status(200).json({ data: selectTag });
-});
+    return res.status(200).json({ data: selectTag });
+  }
+);
 
 const getTweets = require("../routes/getTweets");
 app.use("/getTweets", getTweets);
