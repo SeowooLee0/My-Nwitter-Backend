@@ -3,7 +3,7 @@ import { config } from "../config/config";
 import { Tweets } from "./tweets";
 import { Users } from "./user";
 
-const sequelize = new Sequelize({
+const development = new Sequelize({
   dialect: "mysql",
   host: config.development.host,
   username: config.development.username,
@@ -13,4 +13,13 @@ const sequelize = new Sequelize({
   models: [Tweets, Users],
 });
 
-export default sequelize;
+const test = new Sequelize({
+  dialect: "mysql",
+  host: config.test.host,
+  username: config.test.username,
+  password: config.test.password,
+  database: "test",
+  logging: false,
+});
+
+export default { development, test };

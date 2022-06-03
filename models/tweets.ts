@@ -6,7 +6,7 @@ import {
   Sequelize,
 } from "sequelize-typescript";
 import { IntegerDataType } from "sequelize/types";
-import sequelize from ".";
+const sequelize = require("../models/index");
 
 interface Tag {
   tag: string;

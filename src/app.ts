@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
-import sequelize from "../models";
+import sequelize from "../models/index";
 import { Tweets } from "../models/tweets";
 import bodyParser from "body-parser";
 import cookiePaser from "cookie-parser";
@@ -60,12 +60,21 @@ app.listen("1234", async () => {
   🛡️  Server listening on port: 1234🛡️
   ################################################
 `);
-  await sequelize
+  await sequelize.development
     .sync()
     .then(() => {
       console.log("connection success");
     })
-    .catch((e) => {
+    .catch((e: any) => {
       console.log("error: ", e);
     });
 });
+
+// app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+//   res.locals.message = err.message;
+//   res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
+//   res.status(err.status || 500);
+//   res.render("error");
+// });
+
+module.exports = app;

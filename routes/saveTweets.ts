@@ -1,5 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
-import sequelize from "../models";
+const development = require("../models/index");
 import { Tweets } from "../models/tweets";
 const { verifyAccessToken } = require("../middleware/verifyAccessToken");
 const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
@@ -17,7 +17,7 @@ router.post(
         email: req.email,
         content: req.body.content,
         tag: req.body.tag,
-        write_date: sequelize.literal(`now()`),
+        write_date: development.literal(`now()`),
       }).then((result) => {
         res.status(201).json(result);
       });

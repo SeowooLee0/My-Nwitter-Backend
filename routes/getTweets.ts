@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get(
   "/",
-  verifyRefreshToken,
+  // verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
     const allTweets: Tweets[] = await Tweets.findAll();
     res.status(200).json({ data: allTweets, email: req.email });
