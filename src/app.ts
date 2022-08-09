@@ -54,6 +54,9 @@ app.use("/refreshTokenRequest", refreshTokenRequest);
 const logout = require("../routes/logout");
 app.use("/logout", logout);
 
+const upload = require("../routes/upload");
+app.use("/upload", upload);
+
 app.listen("1234", async () => {
   console.log(`
   ################################################
