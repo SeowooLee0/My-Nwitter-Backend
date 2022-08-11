@@ -18,4 +18,10 @@ export class Users extends Model {
     allowNull: false,
   })
   password!: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  profile!: string;
 }
