@@ -4,6 +4,7 @@ import { Tweets } from "../models/tweets";
 import bodyParser from "body-parser";
 import cookiePaser from "cookie-parser";
 import cors from "cors";
+import path from "path";
 const { verifyAccessToken } = require("../middleware/verifyAccessToken");
 const { Op } = require("sequelize");
 
@@ -18,6 +19,7 @@ app.use(
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookiePaser());
+app.use("/", express.static(path.join("/public/uploads")));
 
 app.get("/", (req: Request, res: Response, next: NextFunction) => {});
 
@@ -38,6 +40,9 @@ app.get(
 
 const getTweets = require("../routes/getTweets");
 app.use("/getTweets", getTweets);
+
+const getUsers = require("../routes/getUsers");
+app.use("/getUsers", getUsers);
 
 const saveTweets = require("../routes/saveTweets");
 app.use("/saveTweets", saveTweets);
