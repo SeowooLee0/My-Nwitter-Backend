@@ -1,4 +1,13 @@
-import { Table, Column, Model, DataType } from "sequelize-typescript";
+import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
+import { IntegerDataType, Optional } from "sequelize/types";
+import { Tweets } from "./tweets";
+
+interface UsersAttributes {
+  id: string;
+  email: string;
+  password: string;
+  profile: string;
+}
 
 @Table({
   timestamps: false,
@@ -10,6 +19,7 @@ export class Users extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    primaryKey: true,
   })
   email!: string;
 
@@ -24,4 +34,14 @@ export class Users extends Model {
     allowNull: true,
   })
   profile!: string;
+
+  @HasMany(() => Tweets)
+  tweets!: Tweets[];
 }
+
+// Users.hasMany(Tweets, {
+//   as: "tweets",
+//   foreignKey: "email",
+// });
+
+// Tweets.belongsTo(Users);

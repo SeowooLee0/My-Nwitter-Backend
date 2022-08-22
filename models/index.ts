@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import { config } from "../config/config";
+import { Comments } from "./comments";
 import { Tweets } from "./tweets";
 import { Users } from "./user";
 
@@ -10,7 +11,7 @@ const development = new Sequelize({
   password: config.development.password,
   database: config.development.database,
   logging: false,
-  models: [Tweets, Users],
+  models: [Tweets, Users, Comments],
 });
 
 const test = new Sequelize({
@@ -21,5 +22,14 @@ const test = new Sequelize({
   database: "test",
   logging: false,
 });
+
+// landings : landingImages -> 1:N
+// db.landings.hasMany(db.landingImages, { as: "landingImages" });
+// db.landingImages.belongsTo(db.landings, {
+//   foreignKey: "landingUuid",
+//   as: "landings",
+// });
+
+development.addModels([Users, Tweets]);
 
 export default { development, test };

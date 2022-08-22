@@ -19,8 +19,8 @@ app.use(
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookiePaser());
-app.use("/", express.static(path.join("/public/uploads")));
-
+app.use("/static", express.static(__dirname + "/public/uploads"));
+console.log(__dirname + "/public/uploads");
 app.get("/", (req: Request, res: Response, next: NextFunction) => {});
 
 app.get(
@@ -40,6 +40,9 @@ app.get(
 
 const getTweets = require("../routes/getTweets");
 app.use("/getTweets", getTweets);
+
+const getSelectTweets = require("../routes/getTweets");
+app.use("/getTweets/select", getSelectTweets);
 
 const getUsers = require("../routes/getUsers");
 app.use("/getUsers", getUsers);

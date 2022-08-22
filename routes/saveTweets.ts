@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
+import { AutoIncrement } from "sequelize-typescript";
 import sequelize from "../models/index";
 import { Tweets } from "../models/tweets";
 const { verifyAccessToken } = require("../middleware/verifyAccessToken");

@@ -4,8 +4,11 @@ import {
   Model,
   DataType,
   Sequelize,
+  BelongsTo,
+  ForeignKey,
 } from "sequelize-typescript";
-import { IntegerDataType } from "sequelize/types";
+import { Association, IntegerDataType } from "sequelize/types";
+import { Users } from "./user";
 const sequelize = require("../models/index");
 
 interface Tag {
@@ -24,8 +27,9 @@ export class Tweets extends Model {
     autoIncrement: true,
     primaryKey: true,
   })
-  number!: IntegerDataType;
+  tweet_id!: IntegerDataType;
 
+  @ForeignKey(() => Users)
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -49,4 +53,7 @@ export class Tweets extends Model {
     allowNull: false,
   })
   write_date!: string;
+
+  @BelongsTo(() => Users)
+  user!: Users;
 }
