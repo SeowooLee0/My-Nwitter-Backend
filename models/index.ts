@@ -30,6 +30,6 @@ const test = new Sequelize({
 //   as: "landings",
 // });
 
-development.addModels([Users, Tweets]);
+development.addModels([Users, Tweets, Comments]);
 
 export default { development, test };

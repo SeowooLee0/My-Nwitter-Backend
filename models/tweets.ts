@@ -6,8 +6,11 @@ import {
   Sequelize,
   BelongsTo,
   ForeignKey,
+  HasMany,
 } from "sequelize-typescript";
 import { Association, IntegerDataType } from "sequelize/types";
+import { Json } from "sequelize/types/utils";
+import { Comments } from "./comments";
 import { Users } from "./user";
 const sequelize = require("../models/index");
 
@@ -37,7 +40,7 @@ export class Tweets extends Model {
   email!: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.JSON,
     allowNull: false,
   })
   content!: string;
@@ -56,4 +59,7 @@ export class Tweets extends Model {
 
   @BelongsTo(() => Users)
   user!: Users;
+
+  @HasMany(() => Comments)
+  comment!: Comments[];
 }

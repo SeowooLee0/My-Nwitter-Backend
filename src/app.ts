@@ -50,6 +50,9 @@ app.use("/getUsers", getUsers);
 const saveTweets = require("../routes/saveTweets");
 app.use("/saveTweets", saveTweets);
 
+const saveComments = require("../routes/saveComments");
+app.use("/saveComments", saveComments);
+
 const register = require("../routes/register");
 app.use("/register", register);
 
