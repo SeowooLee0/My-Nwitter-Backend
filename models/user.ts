@@ -17,9 +17,16 @@ interface UsersAttributes {
 })
 export class Users extends Model {
   @Column({
+    type: DataType.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  })
+  user_id!: IntegerDataType;
+
+  @Column({
     type: DataType.STRING,
     allowNull: false,
-    primaryKey: true,
+    unique: true,
   })
   email!: string;
 

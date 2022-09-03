@@ -34,6 +34,12 @@ export class Tweets extends Model {
 
   @ForeignKey(() => Users)
   @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+  })
+  user_id!: IntegerDataType;
+
+  @Column({
     type: DataType.STRING,
     allowNull: false,
   })
