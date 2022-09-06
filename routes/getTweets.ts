@@ -27,7 +27,21 @@ router.get(
     const selectComments: Tweets[] = await Tweets.findAll({
       include: [Comments],
     });
-    res.status(200).json({ data: selectTweets, selectComments });
+
+    let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
+    console.log(pageNum);
+    let offset = 0;
+
+    if (pageNum > 1) {
+      offset = 10 * (pageNum - 1);
+    }
+
+    const selectCurrentTweets: Tweets[] = await Tweets.findAll({
+      include: [Comments],
+      offset: offset,
+      limit: 10,
+    });
+    res.status(200).json({ data: selectCurrentTweets, email: req.email });
   }
 );
 

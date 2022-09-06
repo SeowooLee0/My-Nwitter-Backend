@@ -41,8 +41,8 @@ app.get(
 const getTweets = require("../routes/getTweets");
 app.use("/getTweets", getTweets);
 
-const getSelectTweets = require("../routes/getTweets");
-app.use("/getTweets/select", getSelectTweets);
+const getSelectCurrentTweets = require("../routes/getTweets");
+app.use("/getTweets/select", getSelectCurrentTweets);
 
 const getUsers = require("../routes/getUsers");
 app.use("/getUsers", getUsers);
