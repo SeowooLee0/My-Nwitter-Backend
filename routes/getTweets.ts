@@ -41,7 +41,11 @@ router.get(
       offset: offset,
       limit: 10,
     });
-    res.status(200).json({ data: selectCurrentTweets, email: req.email });
+    res.status(200).json({
+      data: selectCurrentTweets,
+      email: req.email,
+      dataLength: selectComments.length,
+    });
   }
 );
 
