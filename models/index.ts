@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize-typescript";
 import { config } from "../config/config";
 import { Comments } from "./comments";
+import { Likes } from "./like";
 import { Tweets } from "./tweets";
 import { Users } from "./user";
 
@@ -11,7 +12,7 @@ const development = new Sequelize({
   password: config.development.password,
   database: config.development.database,
   logging: false,
-  models: [Tweets, Users, Comments],
+  models: [Tweets, Users, Comments, Likes],
 });
 
 const test = new Sequelize({
@@ -30,6 +31,6 @@ const test = new Sequelize({
 //   as: "landings",
 // });
 
-development.addModels([Users, Tweets, Comments]);
+development.addModels([Users, Tweets, Comments, Likes]);
 
 export default { development, test };

@@ -11,6 +11,7 @@ import {
 import { Association, IntegerDataType } from "sequelize/types";
 import { Json } from "sequelize/types/utils";
 import { Comments } from "./comments";
+import { Likes } from "./like";
 import { Users } from "./user";
 const sequelize = require("../models/index");
 
@@ -68,4 +69,7 @@ export class Tweets extends Model {
 
   @HasMany(() => Comments)
   comment!: Comments[];
+
+  @HasMany(() => Likes)
+  like!: Likes[];
 }

@@ -29,7 +29,7 @@ router.get(
     });
 
     let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
-    console.log(pageNum);
+
     let offset = 0;
 
     if (pageNum > 1) {

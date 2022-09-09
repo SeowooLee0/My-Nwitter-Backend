@@ -3,6 +3,7 @@ import { send } from "process";
 import { AutoIncrement } from "sequelize-typescript";
 import sequelize from "../models/index";
 import { Tweets } from "../models/tweets";
+import { Users } from "../models/user";
 const { verifyAccessToken } = require("../middleware/verifyAccessToken");
 const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
 const router = express.Router();
@@ -15,7 +16,7 @@ router.post(
     if (req.token === "login again") {
       res.json("login again");
     } else if (req.token === "refresh ok") {
-      await Tweets.findOne({
+      await Users.findOne({
         attributes: ["user_id"],
         where: { email: req.email },
       }).then(async (result: any) => {
