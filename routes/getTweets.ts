@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction, Router } from "express";
 import { Comments } from "../models/comments";
+import { Likes } from "../models/like";
 import { Tweets } from "../models/tweets";
 import { Users } from "../models/user";
 const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
@@ -29,15 +30,13 @@ router.get(
     });
 
     let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
-
     let offset = 0;
-
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
     }
 
     const selectCurrentTweets: Tweets[] = await Tweets.findAll({
-      include: [Comments],
+      include: [Comments, Likes],
       offset: offset,
       limit: 10,
     });
