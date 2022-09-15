@@ -35,7 +35,7 @@ export class Likes extends Model {
 
   @Column({
     type: DataType.JSON,
-    allowNull: false,
+    allowNull: true,
   })
   like_users!: Json;
 

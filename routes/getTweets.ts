@@ -25,15 +25,17 @@ router.get(
     const selectTweets: Users[] = await Users.findAll({
       include: [Tweets],
     });
-    const selectComments: Tweets[] = await Tweets.findAll({
-      include: [Comments],
-    });
 
     let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
     let offset = 0;
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
     }
+    const selectComments: Tweets[] = await Tweets.findAll({
+      include: [Comments],
+      offset: offset,
+      limit: 10,
+    });
 
     const selectCurrentTweets: Tweets[] = await Tweets.findAll({
       include: [Comments, Likes],

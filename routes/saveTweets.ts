@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import { send } from "process";
 import { AutoIncrement } from "sequelize-typescript";
 import sequelize from "../models/index";
+import { Likes } from "../models/like";
 import { Tweets } from "../models/tweets";
 import { Users } from "../models/user";
 const { verifyAccessToken } = require("../middleware/verifyAccessToken");
@@ -26,11 +27,34 @@ router.post(
           content: req.body.content,
           tag: req.body.tag,
           write_date: sequelize.development.literal(`now()`),
-        }).then((result) => {
-          res.status(201).json(result);
+        }).then(async (result) => {
+          // res.status(201).json(result);
+          // console.log(result.tweet_id);
+          await Likes.create({
+            tweet_id: result.tweet_id,
+          });
         });
       });
     }
+  }
+);
+
+router.post(
+  "/like",
+  verifyAccessToken,
+  verifyRefreshToken,
+  async (req: any, res: Response, next: NextFunction) => {
+    console.log(req.body.tweetId);
+    await Likes.update(
+      {
+        like_users: req.body.data,
+      },
+      {
+        where: { tweet_id: req.body.tweetId },
+      }
+    ).then((result: any) => {
+      res.status(201).json(result);
+    });
   }
 );
 
