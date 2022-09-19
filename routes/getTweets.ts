@@ -31,11 +31,6 @@ router.get(
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
     }
-    const selectComments: Tweets[] = await Tweets.findAll({
-      include: [Comments],
-      offset: offset,
-      limit: 10,
-    });
 
     const selectCurrentTweets: Tweets[] = await Tweets.findAll({
       include: [Comments, Likes],
@@ -45,7 +40,7 @@ router.get(
     res.status(200).json({
       data: selectCurrentTweets,
       email: req.email,
-      dataLength: selectComments.length,
+      dataLength: selectCurrentTweets.length,
     });
   }
 );

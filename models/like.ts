@@ -34,10 +34,10 @@ export class Likes extends Model {
   tweet_id!: IntegerDataType;
 
   @Column({
-    type: DataType.JSON,
+    type: DataType.INTEGER,
     allowNull: true,
   })
-  like_users!: Json;
+  user_id!: IntegerDataType;
 
   @BelongsTo(() => Tweets)
   tweets!: Tweets;

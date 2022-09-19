@@ -47,7 +47,7 @@ router.post(
     console.log(req.body.tweetId);
     await Likes.update(
       {
-        like_users: req.body.data,
+        user_id: req.body.data,
       },
       {
         where: { tweet_id: req.body.tweetId },
