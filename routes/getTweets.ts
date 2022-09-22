@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction, Router } from "express";
+import { read } from "fs";
 import { Comments } from "../models/comments";
 import { Likes } from "../models/like";
 import { Tweets } from "../models/tweets";
@@ -32,15 +33,79 @@ router.get(
       offset = 10 * (pageNum - 1);
     }
 
-    const selectCurrentTweets: Tweets[] = await Tweets.findAll({
+    const selectCurrentTweets = await Tweets.findAll({
       include: [Comments, Likes],
       offset: offset,
       limit: 10,
+    }).then((d: any) => {
+      return d.map((d: any) => {
+        // console.log(
+        //   d.like.find((l: any) => {
+        //     return l.user_id === null;
+        //   })
+        // );
+        if (
+          d.like.find((l: any) => {
+            return l.user_id === null;
+          })
+        ) {
+          return {
+            tweet_id: d.tweet_id,
+            content: d.content,
+            comment: d.comment,
+            email: d.email,
+            like: d.like,
+            tag: d.tag,
+            user_id: d.user_id,
+            write_date: d.write_date,
+            is_like: false,
+          };
+        }
+
+        if (
+          d.like.find((l: any) => {
+            return l.user_id === null;
+          }) == undefined
+        ) {
+          return {
+            tweet_id: d.tweet_id,
+            content: d.content,
+            comment: d.comment,
+            email: d.email,
+            like: d.like,
+            tag: d.tag,
+            user_id: d.user_id,
+            write_date: d.write_date,
+            is_like: true,
+          };
+        }
+      });
     });
+
+    // let likeData = await Likes.findAll().then((Likes: any) => {
+    //   return Likes.map((d: any) => {
+    //     if (d.user_id == null) {
+    //       return {
+    //         tweet_id: d.tweet_id,
+    //         is_like: false,
+    //       };
+    //     }
+    //     if (d.user_id == req.email) {
+    //       return {
+    //         tweet_id: d.tweet_id,
+    //         is_like: true,
+    //       };
+    //     }
+    //   });
+    // });
+    // let data = { , likeData };
+    // console.log(likeData.filter((d: any) => d.tweet_id == "1"));
+
+    console.log({ ...selectCurrentTweets });
     res.status(200).json({
       data: selectCurrentTweets,
       email: req.email,
-      dataLength: selectCurrentTweets.length,
+      // dataLength: selectCurrentTweets.length,
     });
   }
 );
