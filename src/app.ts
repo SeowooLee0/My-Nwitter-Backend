@@ -47,11 +47,17 @@ app.use("/getTweets/select", getSelectCurrentTweets);
 const getUsers = require("../routes/getUsers");
 app.use("/getUsers", getUsers);
 
+const getComments = require("../routes/getComments");
+app.use("/getComments", getComments);
+
 const saveTweets = require("../routes/saveTweets");
 app.use("/saveTweets", saveTweets);
 
 const saveComments = require("../routes/saveComments");
 app.use("/saveComments", saveComments);
+
+const saveLike = require("../routes/saveLike");
+app.use("/saveLike", saveLike);
 
 const register = require("../routes/register");
 app.use("/register", register);

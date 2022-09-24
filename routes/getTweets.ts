@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction, Router } from "express";
 import { read } from "fs";
+import { where } from "sequelize/types";
 import { Comments } from "../models/comments";
 import { Likes } from "../models/like";
 import { Tweets } from "../models/tweets";
@@ -23,8 +24,12 @@ router.get(
   "/select",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    const selectTweets: Users[] = await Users.findAll({
-      include: [Tweets],
+    const currentUser: Users[] = await Users.findOne({
+      where: {
+        email: req.email,
+      },
+    }).then((r: any) => {
+      return r.user_id;
     });
 
     let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
@@ -34,7 +39,7 @@ router.get(
     }
 
     const selectCurrentTweets = await Tweets.findAll({
-      include: [Comments, Likes],
+      include: [Likes],
       offset: offset,
       limit: 10,
     }).then((d: any) => {
@@ -44,39 +49,43 @@ router.get(
         //     return l.user_id === null;
         //   })
         // );
+
         if (
           d.like.find((l: any) => {
-            return l.user_id === null;
+            return l.user_id === currentUser;
           })
         ) {
           return {
             tweet_id: d.tweet_id,
             content: d.content,
-            comment: d.comment,
-            email: d.email,
-            like: d.like,
-            tag: d.tag,
-            user_id: d.user_id,
-            write_date: d.write_date,
-            is_like: false,
-          };
-        }
 
-        if (
-          d.like.find((l: any) => {
-            return l.user_id === null;
-          }) == undefined
-        ) {
-          return {
-            tweet_id: d.tweet_id,
-            content: d.content,
-            comment: d.comment,
             email: d.email,
             like: d.like,
             tag: d.tag,
             user_id: d.user_id,
             write_date: d.write_date,
             is_like: true,
+            comment: [],
+            is_opened: false,
+          };
+        }
+
+        if (
+          d.like.find((l: any) => {
+            return l.user_id === currentUser;
+          }) == undefined
+        ) {
+          return {
+            tweet_id: d.tweet_id,
+            content: d.content,
+            email: d.email,
+            like: d.like,
+            tag: d.tag,
+            user_id: d.user_id,
+            write_date: d.write_date,
+            is_like: false,
+            comment: [],
+            is_opened: false,
           };
         }
       });
@@ -101,7 +110,6 @@ router.get(
     // let data = { , likeData };
     // console.log(likeData.filter((d: any) => d.tweet_id == "1"));
 
-    console.log({ ...selectCurrentTweets });
     res.status(200).json({
       data: selectCurrentTweets,
       email: req.email,
