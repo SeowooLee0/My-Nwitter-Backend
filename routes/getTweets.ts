@@ -44,50 +44,45 @@ router.get(
       limit: 10,
     }).then((d: any) => {
       return d.map((d: any) => {
-        // console.log(
+        let isLike = false;
+        if (
+          d.like.include(currentUser)
+          // d.like.find((l: any) => {
+          //   return l.user_id === currentUser;
+          // })
+        ) {
+          isLike = true;
+        }
+        return {
+          tweet_id: d.tweet_id,
+          content: d.content,
+          email: d.email,
+          like: d.like,
+          tag: d.tag,
+          user_id: d.user_id,
+          write_date: d.write_date,
+          is_like: isLike,
+          comment: [],
+          is_opened: false,
+        };
+        // if (
         //   d.like.find((l: any) => {
-        //     return l.user_id === null;
-        //   })
-        // );
-
-        if (
-          d.like.find((l: any) => {
-            return l.user_id === currentUser;
-          })
-        ) {
-          return {
-            tweet_id: d.tweet_id,
-            content: d.content,
-
-            email: d.email,
-            like: d.like,
-            tag: d.tag,
-            user_id: d.user_id,
-            write_date: d.write_date,
-            is_like: true,
-            comment: [],
-            is_opened: false,
-          };
-        }
-
-        if (
-          d.like.find((l: any) => {
-            return l.user_id === currentUser;
-          }) == undefined
-        ) {
-          return {
-            tweet_id: d.tweet_id,
-            content: d.content,
-            email: d.email,
-            like: d.like,
-            tag: d.tag,
-            user_id: d.user_id,
-            write_date: d.write_date,
-            is_like: false,
-            comment: [],
-            is_opened: false,
-          };
-        }
+        //     return l.user_id === currentUser;
+        //   }) == undefined
+        // ) {
+        //   return {
+        //     tweet_id: d.tweet_id,
+        //     content: d.content,
+        //     email: d.email,
+        //     like: d.like,
+        //     tag: d.tag,
+        //     user_id: d.user_id,
+        //     write_date: d.write_date,
+        //     is_like: false,
+        //     comment: [],
+        //     is_opened: false,
+        //   };
+        // }
       });
     });
 

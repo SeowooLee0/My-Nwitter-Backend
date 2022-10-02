@@ -11,6 +11,8 @@ const development = new Sequelize({
   username: config.development.username,
   password: config.development.password,
   database: config.development.database,
+  timezone: config.development.timezone,
+  dialectOptions: config.development.dialectOptions,
   logging: false,
   models: [Tweets, Users, Comments, Likes],
 });
@@ -21,6 +23,8 @@ const test = new Sequelize({
   username: config.test.username,
   password: config.test.password,
   database: "test",
+
+  timezone: config.test.timezone,
   logging: false,
 });
 

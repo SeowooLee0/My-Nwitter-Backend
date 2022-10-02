@@ -50,6 +50,9 @@ app.use("/getUsers", getUsers);
 const getComments = require("../routes/getComments");
 app.use("/getComments", getComments);
 
+const newComments = require("../routes/getComments");
+app.use("/getComments/newComments", newComments);
+
 const saveTweets = require("../routes/saveTweets");
 app.use("/saveTweets", saveTweets);
 
