@@ -45,14 +45,19 @@ router.get(
     }).then((d: any) => {
       return d.map((d: any) => {
         let isLike = false;
+
         if (
-          d.like.include(currentUser)
+          d.like.some((i: any) => {
+            return i.user_id === currentUser;
+          })
+
           // d.like.find((l: any) => {
           //   return l.user_id === currentUser;
           // })
         ) {
           isLike = true;
         }
+
         return {
           tweet_id: d.tweet_id,
           content: d.content,
