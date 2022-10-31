@@ -1,3 +1,4 @@
+import { count } from "console";
 import express, { Request, Response, NextFunction, Router } from "express";
 import { read } from "fs";
 import { where } from "sequelize/types";
@@ -110,8 +111,11 @@ router.get(
     // let data = { , likeData };
     // console.log(likeData.filter((d: any) => d.tweet_id == "1"));
 
+    let count = await Tweets.count();
+
     res.status(200).json({
       data: selectCurrentTweets,
+      count,
       email: req.email,
       // dataLength: selectCurrentTweets.length,
     });

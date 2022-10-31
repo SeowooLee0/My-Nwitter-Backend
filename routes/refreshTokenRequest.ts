@@ -22,11 +22,11 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
         email: data.email,
       };
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "10m",
+        expiresIn: "100m",
       });
       return res.json({
         accessToken,
-
+        email: data.email,
         message: "ok",
       });
     }
