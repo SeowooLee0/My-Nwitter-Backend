@@ -33,11 +33,6 @@ io.on("connection", (socket: any) => {
 
   socket.on("disconnect", async () => {
     console.log("클라이언트 접속 해제", socket.id);
-    // SocketId.destroy({
-    //   where: {
-    //     socket_id: socket.id,
-    //   },
-    // });
     clearInterval(socket.interval);
   });
 
@@ -45,11 +40,10 @@ io.on("connection", (socket: any) => {
   socket.on("error", (error: any) => {
     console.error(error);
   });
-  // socket.on("chat-message", (msg) => {
-  //   console.log("message:", msg);
-  // });
+
   socket.on("login", async (data: any) => {
     // 'client' room에 넣는다.
+    await socket.join("client");
     await Users.findOne({
       where: {
         email: data.email,
@@ -75,14 +69,23 @@ io.on("connection", (socket: any) => {
         tweet_id: data.tweetId,
       },
     }).then((r: any) => {
-      console.log(data);
       console.log(`소켓ID:${r.user_id}에게 소켓이벤트 SEND_MESSAGE 전송`);
       SocketId.findOne({
         where: {
           user_id: r.user_id,
         },
       }).then((s: any) => {
-        io.to(s.socket_id).emit("RECEIVE_MESSAGE", data);
+        const clientsList = socket.adapter.rooms.get("client");
+        const numClients = clientsList ? clientsList.size : 0;
+
+        let currnetClient: any[] = [];
+        socket.adapter.rooms.get("client").forEach((name: any) => {
+          if (name === s.socket_id) {
+            console.log("성공");
+            io.to(s.socket_id).emit("RECEIVE_MESSAGE", name, s.socket_id);
+          }
+        });
+        // console.log(currnetClient);
       });
     });
     // 레디스에서 userID를 통해 socketID를 찾는다.
