@@ -9,7 +9,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   const generateAccessToken = (email: any) => {
     return jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "100m",
+      expiresIn: "30m",
     });
   };
 
@@ -42,8 +42,12 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
         secure: true,
         httpOnly: true,
       })
+      .cookie("accessToken", accessToken, {
+        secure: true,
+        httpOnly: true,
+      })
       .status(200)
-      .json({ accessToken, message: "ok" });
+      .json({ message: "ok" });
   } catch (err: any) {
     return res.status(400).send({ err: err.message });
   }

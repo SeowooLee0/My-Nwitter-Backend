@@ -77,9 +77,8 @@ io.on("connection", (socket: any) => {
       }).then((s: any) => {
         const clientsList = socket.adapter.rooms.get("client");
         const numClients = clientsList ? clientsList.size : 0;
-
-        let currnetClient: any[] = [];
         socket.adapter.rooms.get("client").forEach((name: any) => {
+          //break, 접속자가 많았을때 forEach?, redis 조회
           if (name === s.socket_id) {
             console.log("성공");
             io.to(s.socket_id).emit("RECEIVE_MESSAGE", name, s.socket_id);

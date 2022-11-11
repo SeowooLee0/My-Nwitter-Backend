@@ -6,8 +6,8 @@ module.exports.verifyAccessToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const authorization: any = req.headers.authorization;
-  const token = authorization.split("Bearer ")[1];
+  const token = req.cookies.accessToken;
+  // const token = authorization.split("Bearer ")[1];
 
   try {
     let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);

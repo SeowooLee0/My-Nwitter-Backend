@@ -24,8 +24,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "100m",
       });
-      return res.json({
-        accessToken,
+      return res.cookie("accessToken", accessToken).json({
         email: data.email,
         message: "ok",
       });
