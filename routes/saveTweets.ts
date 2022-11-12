@@ -28,6 +28,7 @@ router.post(
           tag: req.body.tag,
           write_date: sequelize.development.literal(`now()`),
         }).then(async (result) => {
+          res.status(201).json(result);
           // res.status(201).json(result);
           // console.log(result.tweet_id);
           await Likes.create({

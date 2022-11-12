@@ -7,6 +7,8 @@ import cors from "cors";
 import path from "path";
 import { Users } from "../models/user";
 import { SocketId } from "../models/socketId";
+import e from "express";
+import { tsConstructSignatureDeclaration } from "@babel/types";
 const { verifyAccessToken } = require("../middleware/verifyAccessToken");
 const { Op } = require("sequelize");
 
@@ -69,7 +71,6 @@ io.on("connection", (socket: any) => {
         tweet_id: data.tweetId,
       },
     }).then((r: any) => {
-      console.log(`소켓ID:${r.user_id}에게 소켓이벤트 SEND_MESSAGE 전송`);
       SocketId.findOne({
         where: {
           user_id: r.user_id,
@@ -77,13 +78,31 @@ io.on("connection", (socket: any) => {
       }).then((s: any) => {
         const clientsList = socket.adapter.rooms.get("client");
         const numClients = clientsList ? clientsList.size : 0;
-        socket.adapter.rooms.get("client").forEach((name: any) => {
-          //break, 접속자가 많았을때 forEach?, redis 조회
-          if (name === s.socket_id) {
+        console.log(clientsList);
+        // let i = 0;
+
+        // for (let i = 0; i < numClients; i++) {
+        //   if (socket.adapter.rooms.get("client")[i] == s.socket_id) {
+        //     console.log("성공");
+        //     io.to(s.socket_id).emit("RECEIVE_MESSAGE", name, s.socket_id);
+        //     break;
+        //   }
+        // }
+        try {
+          socket.adapter.rooms.get("client").forEach((name: any) => {
+            //break, 접속자가 많았을때 forEach?, redis 조회
+            console.log(name);
+            if (name === s.socket_id) {
+              io.to(s.socket_id).emit("RECEIVE_MESSAGE", name, s.socket_id);
+              throw new Error("stop loop");
+            }
+          });
+        } catch (e: any) {
+          if (e == "Error: stop loop") {
             console.log("성공");
-            io.to(s.socket_id).emit("RECEIVE_MESSAGE", name, s.socket_id);
           }
-        });
+        }
+
         // console.log(currnetClient);
       });
     });
