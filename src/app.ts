@@ -91,7 +91,7 @@ io.on("connection", (socket: any) => {
         try {
           socket.adapter.rooms.get("client").forEach((name: any) => {
             //break, 접속자가 많았을때 forEach?, redis 조회
-            console.log(name);
+
             if (name === s.socket_id) {
               io.to(s.socket_id).emit("RECEIVE_MESSAGE", name, s.socket_id);
               throw new Error("stop loop");
