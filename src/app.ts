@@ -121,6 +121,7 @@ app.get(
   "/tag/:tagId",
   async (req: Request, res: Response): Promise<Response> => {
     const { tagId } = req.params;
+      
 
     const selectTag: Tweets[] = await Tweets.findAll({
       where: {
@@ -137,6 +138,14 @@ app.use("/getTweets", getTweets);
 
 const getSelectCurrentTweets = require("../routes/getTweets");
 app.use("/getTweets/select", getSelectCurrentTweets);
+
+const getTopTweets = require("../routes/getTweets");
+app.use("/getTweets/top", getTopTweets);
+
+const getLatestTweets = require("../routes/getTweets");
+app.use("/getTweets/latest", getLatestTweets);
+const getPeopleData = require("../routes/getTweets");
+app.use("/getTweets/people", getPeopleData);
 
 const getUsers = require("../routes/getUsers");
 app.use("/getUsers", getUsers);

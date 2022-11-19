@@ -22,7 +22,7 @@ router.get("/", async (req: Request, res: Response, next: NextFunction) => {
         email: data.email,
       };
       const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET, {
-        expiresIn: "100m",
+        expiresIn: "30m",
       });
       return res.cookie("accessToken", accessToken).json({
         email: data.email,

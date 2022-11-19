@@ -47,13 +47,14 @@ export class Tweets extends Model {
   email!: string;
 
   @Column({
-    type: DataType.JSON,
+    type: DataType.STRING,
     allowNull: false,
   })
   content!: string;
 
   @Column({
     type: DataType.JSON,
+
     allowNull: false,
   })
   tag!: string;

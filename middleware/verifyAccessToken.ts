@@ -6,7 +6,8 @@ module.exports.verifyAccessToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies.accessToken;
+  const authorization: any = req.headers.authorization;
+  const token = authorization.split("Bearer ")[1];
   // const token = authorization.split("Bearer ")[1];
 
   try {
