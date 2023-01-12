@@ -98,9 +98,7 @@ io.on("connection", (socket: any) => {
             }
           });
         } catch (e: any) {
-          if (e == "Error: stop loop") {
-            console.log("성공");
-          }
+          console.log("탈출");
         }
 
         // console.log(currnetClient);
@@ -121,7 +119,6 @@ app.get(
   "/tag/:tagId",
   async (req: Request, res: Response): Promise<Response> => {
     const { tagId } = req.params;
-      
 
     const selectTag: Tweets[] = await Tweets.findAll({
       where: {

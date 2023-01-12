@@ -1,4 +1,3 @@
-import { count } from "console";
 import express, { Request, Response, NextFunction, Router } from "express";
 import { read } from "fs";
 import { JSONB, literal, Op, or } from "sequelize";
@@ -11,6 +10,7 @@ import { Likes } from "../models/like";
 import { Tweets } from "../models/tweets";
 import { Users } from "../models/user";
 import sequelize from "../models/index";
+import { count } from "console";
 const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
 
 const router = express.Router();
@@ -38,7 +38,9 @@ router.get(
       return r.user_id;
     });
 
-    let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
+    let pageNum = Number(res.req.query.currentPage);
+
+    console.log(res.req.query.currentPage); // 요청 페이지 넘버
     let offset = 0;
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
@@ -72,6 +74,7 @@ router.get(
           tag: d.tag,
           user_id: d.user_id,
           write_date: d.write_date,
+          upload_file: d.upload_file,
           is_like: isLike,
           comment: [],
           is_opened: false,
@@ -117,11 +120,13 @@ router.get(
     // console.log(likeData.filter((d: any) => d.tweet_id == "1"));
 
     let count = await Tweets.count();
+    let totalPageNumber = Math.round((await Tweets.count()) / 10);
 
     res.status(200).json({
       data: selectCurrentTweets,
       count,
       email: req.email,
+      totalPageNumber: totalPageNumber,
       // dataLength: selectCurrentTweets.length,
     });
   }
@@ -131,7 +136,22 @@ router.get(
   "/top",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
+    let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
+
+    let offset = 0;
+    if (pageNum > 1) {
+      offset = 10 * (pageNum - 1);
+    }
+
     const { search } = res.req.query;
+    let count = await Tweets.count({
+      where: {
+        [Op.or]: [
+          { content: { [Op.like]: [`%${search}%`] } },
+          { tag: { [Op.like]: [`%${search}%`] } },
+        ],
+      },
+    });
 
     const currentUser: Users[] = await Users.findOne({
       where: {
@@ -142,6 +162,8 @@ router.get(
     });
     const topUser = await Tweets.findAll({
       include: [Likes, Comments],
+      offset: offset,
+      limit: 10,
       where: {
         [Op.or]: [
           { content: { [Op.like]: [`%${search}%`] } },
@@ -168,6 +190,7 @@ router.get(
           tag: d.tag,
           user_id: d.user_id,
           write_date: d.write_date,
+          upload_file: d.upload_file,
           is_like: isLike,
           comment: [],
           is_opened: false,
@@ -176,6 +199,7 @@ router.get(
     });
     res.status(200).json({
       data: topUser,
+      count: count,
     });
   }
 );
@@ -184,8 +208,21 @@ router.get(
   "/latest",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
+    let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
+
+    let offset = 0;
+    if (pageNum > 1) {
+      offset = 10 * (pageNum - 1);
+    }
     const { search } = res.req.query;
-    console.log(search);
+    let count = await Tweets.count({
+      where: {
+        [Op.or]: [
+          { content: { [Op.like]: [`%${search}%`] } },
+          { tag: { [Op.like]: [`%${search}%`] } },
+        ],
+      },
+    });
 
     const currentUser: Users[] = await Users.findOne({
       where: {
@@ -196,7 +233,8 @@ router.get(
     });
     const latestData = await Tweets.findAll({
       include: [Likes, Comments],
-
+      offset: offset,
+      limit: 10,
       where: {
         [Op.or]: [
           { content: { [Op.like]: [`%${search}%`] } },
@@ -227,13 +265,14 @@ router.get(
           is_like: isLike,
           comment: [],
           is_opened: false,
+          upload_file: d.upload_file,
         };
       });
     });
+
     res.status(200).json({
       data: latestData,
-
-      // dataLength: selectCurrentTweets.length,
+      count: count,
     });
   }
 );
@@ -242,16 +281,29 @@ router.get(
   "/people",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
+    let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
+    let offset = 0;
+    if (pageNum > 1) {
+      offset = 10 * (pageNum - 1);
+    }
     const { search } = res.req.query;
-    const peopleData = await Users.findAll({
+    let count = await Users.count({
       where: {
         email: { [Op.like]: [`%${search}%`] },
       },
     });
+
+    const peopleData = await Users.findAll({
+      where: {
+        email: { [Op.like]: [`%${search}%`] },
+      },
+      offset: offset,
+      limit: 10,
+    });
+
     res.status(200).json({
       data: peopleData,
-
-      // dataLength: selectCurrentTweets.length,
+      count: count,
     });
   }
 );

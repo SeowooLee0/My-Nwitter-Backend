@@ -1,7 +1,14 @@
+import express, { Request, Response, NextFunction } from "express";
+import { Likes } from "../models/like";
+import { Tweets } from "../models/tweets";
 import { Users } from "../models/user";
+import sequelize from "../models/index";
 const fs = require("fs");
-const express = require("express");
+
 const multer = require("multer");
+
+const { verifyAccessToken } = require("../middleware/verifyAccessToken");
+const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
 
 const path = require("path");
 
@@ -19,7 +26,7 @@ fs.readdir("src/public/uploads", (error: any) => {
   }
 });
 
-const storage = multer.diskStorage({
+const profileStorage = multer.diskStorage({
   destination: (req: any, file: any, cb: any) => {
     cb(null, "src/public/uploads/");
   },
@@ -28,7 +35,23 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage: storage }).single("profile_img");
+const tweetsStorage = multer.diskStorage({
+  destination: (req: any, file: any, cb: any) => {
+    // console.log(req, file);
+    cb(null, "src/public/tweets/");
+  },
+  filename: (req: any, file: any, cb: any) => {
+    cb(null, `${Date.now()}_${file.originalname}`);
+  },
+});
+
+const upload = multer({ storage: profileStorage }).single("profile_img");
+const uploadTweets = multer({ storage: tweetsStorage }).fields([
+  { name: "upload_file" },
+  { name: "id" },
+  { name: "tweet" },
+  { name: "tag" },
+]);
 
 router.post("/", (req: any, res: any) => {
   upload(req, res, async (err: any) => {
@@ -50,9 +73,51 @@ router.post("/", (req: any, res: any) => {
         image: res.req.file.path,
         fileName: res.req.file.filename,
       });
-      console.log(req.file);
+      console.log(res.req.file);
     });
   });
 });
+
+router.post(
+  "/tweets",
+  // verifyAccessToken,
+  // verifyRefreshToken,
+  async (req: any, res: any, next: NextFunction) => {
+    // if (req.token === "login again") {
+    //   res.json("login again");
+    // } else if (req.token === "refresh ok") {
+
+    uploadTweets(req, res, async (err: any) => {
+      if (err) {
+        console.log(err);
+        return res.json({ success: false, err });
+      }
+
+      console.log(res.req.files.upload_file[0].filename, res.req.body.id);
+      await Users.findOne({
+        attributes: ["user_id"],
+        where: { email: res.req.body.id },
+      }).then(async (result: any) => {
+        await Tweets.create({
+          user_id: result.user_id,
+          email: res.req.body.id,
+          content: res.req.body.tweet,
+          tag: [res.req.body.tag],
+          upload_file: res.req.files.upload_file[0].filename,
+          write_date: sequelize.development.literal(`now()`),
+        }).then(async (result) => {
+          console.log(result);
+          res.status(201).json(result);
+          // res.status(201).json(result);
+          // console.log(result.tweet_id);
+          await Likes.create({
+            tweet_id: result.tweet_id,
+          });
+        });
+      });
+    });
+  }
+  // }
+);
 
 module.exports = router;
