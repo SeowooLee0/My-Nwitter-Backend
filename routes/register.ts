@@ -1,4 +1,5 @@
 import express, { Request, Response, NextFunction } from "express";
+import { Follow } from "../models/follow";
 import { Users } from "../models/user";
 const bcrypt = require("bcrypt");
 
@@ -15,8 +16,11 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   await Users.create({
     email: email,
     password: hashedPassword,
-  }).then((result) => {
+  }).then(async (result) => {
     res.status(201).json(result);
+    await Follow.create({
+      user_id: result.user_id,
+    });
   });
 });
 

@@ -27,14 +27,14 @@ export class Follow extends Model {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true,
     // primaryKey: true,
   })
   follower_id!: IntegerDataType;
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: true,
+    allowNull: false,
   })
   user_id!: IntegerDataType;
 }
