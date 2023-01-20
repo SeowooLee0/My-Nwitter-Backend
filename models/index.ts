@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize-typescript";
 import { config } from "../config/config";
 import { Comments } from "./comments";
+import { Follow } from "./follow";
 import { Likes } from "./like";
 import { SocketId } from "./socketId";
 import { Tweets } from "./tweets";
@@ -15,7 +16,7 @@ const development = new Sequelize({
   timezone: config.development.timezone,
   dialectOptions: config.development.dialectOptions,
   logging: false,
-  models: [Tweets, Users, Comments, Likes, SocketId],
+  models: [Tweets, Users, Comments, Likes, SocketId, Follow],
 });
 
 const test = new Sequelize({
