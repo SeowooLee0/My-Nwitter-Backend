@@ -10,6 +10,7 @@ import {
 import { IntegerDataType, Optional } from "sequelize/types";
 import { Json } from "sequelize/types/utils";
 import { Tweets } from "./tweets";
+import { Users } from "./user";
 
 @Table({
   timestamps: false,
@@ -25,6 +26,7 @@ export class Follow extends Model {
   })
   id!: IntegerDataType;
 
+  @ForeignKey(() => Users)
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
@@ -37,4 +39,7 @@ export class Follow extends Model {
     allowNull: false,
   })
   user_id!: IntegerDataType;
+
+  @BelongsTo(() => Users)
+  user!: Users;
 }

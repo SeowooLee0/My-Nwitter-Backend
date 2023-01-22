@@ -11,6 +11,7 @@ import { Tweets } from "../models/tweets";
 import { Users } from "../models/user";
 import sequelize from "../models/index";
 import { count } from "console";
+import { Follow } from "../models/follow";
 const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
 
 const router = express.Router();
@@ -297,14 +298,23 @@ router.get(
       where: {
         email: { [Op.like]: [`%${search}%`] },
       },
+      include: [Follow],
       offset: offset,
       limit: 10,
     });
+
+    // return {
+    //     user_id: u.user_id,
+    //     following_id: following,
+    //     email: u.email,
+    //     profile: u.profile,
+    //   };
 
     res.status(200).json({
       data: peopleData,
       count: count,
     });
+    console.log(peopleData);
   }
 );
 

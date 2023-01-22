@@ -112,7 +112,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookiePaser());
 app.use("/static", express.static(__dirname + "/public/uploads"));
-// console.log(__dirname + "/public/uploads");
+console.log(__dirname + "/public/uploads");
 app.get("/", (req: Request, res: Response, next: NextFunction) => {});
 
 app.get(
@@ -176,6 +176,9 @@ app.use("/logout", logout);
 
 const upload = require("../routes/upload");
 app.use("/upload", upload);
+
+const saveFollow = require("../routes/saveFollow");
+app.use("/saveFollow", saveFollow);
 
 server.listen(port, async () => {
   console.log(`

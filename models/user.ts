@@ -1,5 +1,6 @@
 import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
 import { IntegerDataType, Optional } from "sequelize/types";
+import { Follow } from "./follow";
 import { Tweets } from "./tweets";
 
 interface UsersAttributes {
@@ -44,6 +45,8 @@ export class Users extends Model {
 
   @HasMany(() => Tweets)
   tweets!: Tweets[];
+  @HasMany(() => Follow)
+  follow!: Follow[];
 }
 
 // Users.hasMany(Tweets, {
