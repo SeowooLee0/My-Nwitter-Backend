@@ -26,7 +26,6 @@ export class Follow extends Model {
   })
   id!: IntegerDataType;
 
-  @ForeignKey(() => Users)
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
@@ -34,6 +33,7 @@ export class Follow extends Model {
   })
   follower_id!: IntegerDataType;
 
+  @ForeignKey(() => Users)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,

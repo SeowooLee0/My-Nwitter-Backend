@@ -55,7 +55,7 @@ router.post(
     } else if (req.token === "refresh ok") {
       await Follow.destroy({
         where: {
-          user_id: req.body.follower_id,
+          user_id: req.body.user_id,
           follower_id: currentUser,
         },
       }).then((result) => {

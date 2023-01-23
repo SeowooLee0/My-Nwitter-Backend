@@ -293,7 +293,13 @@ router.get(
         email: { [Op.like]: [`%${search}%`] },
       },
     });
-
+    const currentUser: Users[] = await Users.findOne({
+      where: {
+        email: req.email,
+      },
+    }).then((r: any) => {
+      return r.user_id;
+    });
     const peopleData = await Users.findAll({
       where: {
         email: { [Op.like]: [`%${search}%`] },
@@ -301,14 +307,25 @@ router.get(
       include: [Follow],
       offset: offset,
       limit: 10,
-    });
+    }).then((d: any) => {
+      return d.map((d: any) => {
+        let is_follow = false;
+        if (
+          d.follow.some((i: any) => {
+            return i.follower_id === currentUser;
+          })
+        ) {
+          is_follow = true;
+        }
 
-    // return {
-    //     user_id: u.user_id,
-    //     following_id: following,
-    //     email: u.email,
-    //     profile: u.profile,
-    //   };
+        return {
+          user_id: d.user_id,
+          following: is_follow,
+          email: d.email,
+          profile: d.profile,
+        };
+      });
+    });
 
     res.status(200).json({
       data: peopleData,
