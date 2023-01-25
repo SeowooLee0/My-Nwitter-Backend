@@ -40,8 +40,7 @@ router.get(
     });
 
     let pageNum = Number(res.req.query.currentPage);
-
-    console.log(res.req.query.currentPage); // 요청 페이지 넘버
+    console.log(pageNum);
     let offset = 0;
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
@@ -331,7 +330,6 @@ router.get(
       data: peopleData,
       count: count,
     });
-    console.log(peopleData);
   }
 );
 

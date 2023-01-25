@@ -26,7 +26,6 @@ router.post(
     if (req.token === "login again") {
       res.json("login again");
     } else if (req.token === "refresh ok") {
-      console.log(req.body.user_id);
       await Follow.create({
         user_id: req.body.user_id,
         follower_id: currentUser,

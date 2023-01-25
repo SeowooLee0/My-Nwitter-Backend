@@ -31,10 +31,10 @@ app.use(
 
 io.on("connection", (socket: any) => {
   //connection
-  console.log(socket.id);
+  // console.log(socket.id);
 
   socket.on("disconnect", async () => {
-    console.log("클라이언트 접속 해제", socket.id);
+    // console.log("클라이언트 접속 해제", socket.id);
     clearInterval(socket.interval);
   });
 
@@ -78,7 +78,7 @@ io.on("connection", (socket: any) => {
       }).then((s: any) => {
         const clientsList = socket.adapter.rooms.get("client");
         const numClients = clientsList ? clientsList.size : 0;
-        console.log(clientsList);
+        // console.log(clientsList);
         // let i = 0;
 
         // for (let i = 0; i < numClients; i++) {
