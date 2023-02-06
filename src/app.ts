@@ -51,6 +51,7 @@ io.on("connection", (socket: any) => {
         email: data.email,
       },
     }).then(async (r: any) => {
+      console.log(r);
       await SocketId.destroy({
         where: {
           user_id: r.user_id,
@@ -60,12 +61,41 @@ io.on("connection", (socket: any) => {
         user_id: r.user_id,
         socket_id: socket.id,
       });
+      console.log(socket.id);
     });
 
     // Redis에 userID와 socketID를 저장한다.
   });
 
-  socket.on("SEND_MESSAGE", async (data: any) => {
+  socket.on("SEND_MESSAGE", (m: any) => {
+    SocketId.findOne({
+      where: {
+        user_id: m.receiveUser,
+      },
+    }).then((s: any) => {
+      const clientsList = socket.adapter.rooms.get("client");
+      const numClients = clientsList ? clientsList.size : 0;
+      console.log(clientsList);
+
+      try {
+        socket.adapter.rooms.get("client").forEach((name: any) => {
+          //break, 접속자가 많았을때 forEach?, redis 조회
+
+          if (name === s.socket_id) {
+            let id = m.id;
+            let message = m.message;
+            let date = m.date;
+            io.to(s.socket_id).emit("RECEIVE_MESSAGE", { id, message, date });
+            throw new Error("stop loop");
+          }
+        });
+      } catch (e: any) {
+        console.log(e);
+        console.log("탈출");
+      }
+    });
+  });
+  socket.on("SEND_COMMENT", async (data: any) => {
     await Tweets.findOne({
       where: {
         tweet_id: data.tweetId,
@@ -77,23 +107,13 @@ io.on("connection", (socket: any) => {
         },
       }).then((s: any) => {
         const clientsList = socket.adapter.rooms.get("client");
-        const numClients = clientsList ? clientsList.size : 0;
-        // console.log(clientsList);
-        // let i = 0;
 
-        // for (let i = 0; i < numClients; i++) {
-        //   if (socket.adapter.rooms.get("client")[i] == s.socket_id) {
-        //     console.log("성공");
-        //     io.to(s.socket_id).emit("RECEIVE_MESSAGE", name, s.socket_id);
-        //     break;
-        //   }
-        // }
         try {
           socket.adapter.rooms.get("client").forEach((name: any) => {
             //break, 접속자가 많았을때 forEach?, redis 조회
 
             if (name === s.socket_id) {
-              io.to(s.socket_id).emit("RECEIVE_MESSAGE", name, s.socket_id);
+              io.to(s.socket_id).emit("RECEIVE_COMMENT", name, s.socket_id);
               throw new Error("stop loop");
             }
           });
@@ -179,6 +199,13 @@ app.use("/upload", upload);
 
 const saveFollow = require("../routes/saveFollow");
 app.use("/saveFollow", saveFollow);
+
+// app.use(function (error: any, req: any, res: { json: any }, next: any) {
+//   // Any request to this server will get here, and will send an HTTP
+//   // response with the error message 'woops'
+
+//   res.json({ message: error.message });
+// });
 
 server.listen(port, async () => {
   console.log(`

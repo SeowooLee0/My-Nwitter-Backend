@@ -3,6 +3,7 @@ import { config } from "../config/config";
 import { Comments } from "./comments";
 import { Follow } from "./follow";
 import { Likes } from "./like";
+import { Message } from "./message";
 import { SocketId } from "./socketId";
 import { Tweets } from "./tweets";
 import { Users } from "./user";
@@ -37,6 +38,6 @@ const test = new Sequelize({
 //   as: "landings",
 // });
 
-development.addModels([Users, Tweets, Comments, Likes]);
+development.addModels([Users, Tweets, Comments, Likes, Message]);
 
 export default { development, test };
