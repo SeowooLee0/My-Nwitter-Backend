@@ -14,9 +14,7 @@ router.post(
   verifyAccessToken,
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    if (req.token === "login again") {
-      res.json("login again");
-    } else if (req.token === "refresh ok") {
+    if (req.token === "refresh ok") {
       await Users.findOne({
         attributes: ["user_id"],
         where: { email: req.email },
@@ -39,8 +37,6 @@ router.post(
     }
   }
 );
-
-
 
 router.post(
   "/like",
