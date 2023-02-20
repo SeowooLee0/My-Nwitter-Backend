@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node dist/app.ts",
     "build": "tsc -p .",
-    "dev": "nodemon --watch \"src/**/*.ts\" --exec \"ts-node\" src/app.ts",
+    "dev": "nodemon --watch \"*/*.ts\" --exec \"ts-node\" src/app.ts",
     "test": "NODE_ENV=test jest tests/*.test.ts --forceExit"
   },
   "repository": {
