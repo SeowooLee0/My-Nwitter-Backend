@@ -39,8 +39,8 @@ router.get(
       return r.user_id;
     });
 
-    let pageNum = Number(res.req.query.currentPage);
-    console.log(pageNum);
+    let pageNum = Number(res.req.query.pageCount);
+    console.log(`pageNum = ${pageNum}`);
     let offset = 0;
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
@@ -125,7 +125,7 @@ router.get(
     res.status(200).json({
       data: selectCurrentTweets,
       count,
-      email: req.email,
+      user_id: currentUser,
       totalPageNumber: totalPageNumber,
       // dataLength: selectCurrentTweets.length,
     });
@@ -136,14 +136,18 @@ router.get(
   "/top",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
-
+    let pageNum = Number(res.req.query.pageCount); // 요청 페이지 넘버
+    console.log(pageNum);
+    if (Number.isNaN(pageNum)) {
+      pageNum == 0;
+    }
     let offset = 0;
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
     }
 
     const { search } = res.req.query;
+
     let count = await Tweets.count({
       where: {
         [Op.or]: [
@@ -208,7 +212,7 @@ router.get(
   "/latest",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
+    let pageNum = Number(res.req.query.pageCount); // 요청 페이지 넘버
 
     let offset = 0;
     if (pageNum > 1) {
@@ -281,7 +285,7 @@ router.get(
   "/people",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
+    let pageNum = Number(res.req.query.pageCount); // 요청 페이지 넘버
     let offset = 0;
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
