@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { send } from "process";
 import { AutoIncrement } from "sequelize-typescript";
+import { Bookmark } from "../models/bookmark";
 import sequelize from "../models/index";
 import { Likes } from "../models/like";
 import { Tweets } from "../models/tweets";
@@ -26,11 +27,16 @@ router.post(
           tag: req.body.tag,
           write_date: sequelize.development.literal(`now()`),
         }).then(async (result) => {
+          console.log(result);
           res.status(201).json(result);
           // res.status(201).json(result);
-          // console.log(result.tweet_id);
+          console.log(result.user_id);
           await Likes.create({
             tweet_id: result.tweet_id,
+          });
+          await Bookmark.create({
+            tweet_id: result.tweet_id,
+            user_id: null,
           });
         });
       });
