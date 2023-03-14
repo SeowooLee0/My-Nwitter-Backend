@@ -10,6 +10,7 @@ import {
 } from "sequelize-typescript";
 import { Association, IntegerDataType } from "sequelize/types";
 import { Json } from "sequelize/types/utils";
+import { Bookmark } from "./bookmark";
 import { Comments } from "./comments";
 import { Likes } from "./like";
 import { Users } from "./user";
@@ -73,4 +74,6 @@ export class Tweets extends Model {
 
   @HasMany(() => Likes)
   like!: Likes[];
+  @HasMany(() => Bookmark)
+  bookmark!: Bookmark[];
 }

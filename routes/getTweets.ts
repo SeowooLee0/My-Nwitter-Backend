@@ -12,6 +12,7 @@ import { Users } from "../models/user";
 import sequelize from "../models/index";
 import { count } from "console";
 import { Follow } from "../models/follow";
+import { Bookmark } from "../models/bookmark";
 const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
 
 const router = express.Router();
@@ -40,19 +41,20 @@ router.get(
     });
 
     let pageNum = Number(res.req.query.pageCount);
-    console.log(`pageNum = ${pageNum}`);
+    // console.log(`pageNum = ${pageNum}`);
     let offset = 0;
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
     }
 
     const selectCurrentTweets = await Tweets.findAll({
-      include: [Likes],
+      include: [Likes, Bookmark, Comments],
       offset: offset,
       limit: 10,
     }).then((d: any) => {
       return d.map((d: any) => {
         let isLike = false;
+        let isBookmark = false;
 
         if (
           d.like.some((i: any) => {
@@ -66,6 +68,14 @@ router.get(
           isLike = true;
         }
 
+        if (
+          d.bookmark.some((i: any) => {
+            return i.user_id === currentUser;
+          })
+        ) {
+          isBookmark = true;
+        }
+
         return {
           tweet_id: d.tweet_id,
           content: d.content,
@@ -76,6 +86,7 @@ router.get(
           write_date: d.write_date,
           upload_file: d.upload_file,
           is_like: isLike,
+          is_bookmark: isBookmark,
           comment: [],
           is_opened: false,
         };
@@ -133,11 +144,70 @@ router.get(
 );
 
 router.get(
+  "/bookmark",
+  verifyRefreshToken,
+  async (req: any, res: Response, next: NextFunction) => {
+    const currentUser: Users[] = await Users.findOne({
+      where: {
+        email: req.email,
+      },
+    }).then((r: any) => {
+      return r.user_id;
+    });
+
+    const bookmarkData = await Tweets.findAll({
+      include: [Likes, Bookmark, Comments],
+
+      where: {
+        [Op.or]: [{ user_id: { [Op.like]: [`${currentUser}`] } }],
+      },
+    }).then((d: any) => {
+      return d.map((d: any) => {
+        let isLike = false;
+        let isBookmark = false;
+
+        if (
+          d.like.some((i: any) => {
+            return i.user_id === currentUser;
+          })
+        ) {
+          isLike = true;
+        }
+
+        if (
+          d.bookmark.some((i: any) => {
+            return i.user_id === currentUser;
+          })
+        ) {
+          isBookmark = true;
+        }
+
+        return {
+          tweet_id: d.tweet_id,
+          content: d.content,
+          email: d.email,
+          like: d.like,
+          tag: d.tag,
+          user_id: d.user_id,
+          write_date: d.write_date,
+          upload_file: d.upload_file,
+          is_like: isLike,
+          is_bookmark: isBookmark,
+          comment: [],
+          is_opened: false,
+        };
+      });
+    });
+    res.status(200).json(bookmarkData);
+  }
+);
+
+router.get(
   "/top",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
     let pageNum = Number(res.req.query.pageCount); // 요청 페이지 넘버
-    console.log(pageNum);
+    // console.log(pageNum);
     if (Number.isNaN(pageNum)) {
       pageNum == 0;
     }
@@ -165,7 +235,7 @@ router.get(
       return r.user_id;
     });
     const topUser = await Tweets.findAll({
-      include: [Likes, Comments],
+      include: [Likes, Comments, Bookmark],
       offset: offset,
       limit: 10,
       where: {
@@ -177,6 +247,7 @@ router.get(
     }).then((d: any) => {
       return d.map((d: any) => {
         let isLike = false;
+        let isBookmark = false;
 
         if (
           d.like.some((i: any) => {
@@ -184,6 +255,14 @@ router.get(
           })
         ) {
           isLike = true;
+        }
+
+        if (
+          d.bookmark.some((i: any) => {
+            return i.user_id === currentUser;
+          })
+        ) {
+          isBookmark = true;
         }
 
         return {
@@ -196,6 +275,7 @@ router.get(
           write_date: d.write_date,
           upload_file: d.upload_file,
           is_like: isLike,
+          is_bookmark: isBookmark,
           comment: [],
           is_opened: false,
         };
@@ -236,7 +316,7 @@ router.get(
       return r.user_id;
     });
     const latestData = await Tweets.findAll({
-      include: [Likes, Comments],
+      include: [Likes, Comments, Bookmark],
       offset: offset,
       limit: 10,
       where: {
@@ -249,6 +329,7 @@ router.get(
     }).then((d: any) => {
       return d.map((d: any) => {
         let isLike = false;
+        let isBookmark = false;
 
         if (
           d.like.some((i: any) => {
@@ -256,6 +337,14 @@ router.get(
           })
         ) {
           isLike = true;
+        }
+
+        if (
+          d.bookmark.some((i: any) => {
+            return i.user_id === currentUser;
+          })
+        ) {
+          isBookmark = true;
         }
 
         return {
@@ -267,6 +356,7 @@ router.get(
           user_id: d.user_id,
           write_date: d.write_date,
           is_like: isLike,
+          is_bookmark: isBookmark,
           comment: [],
           is_opened: false,
           upload_file: d.upload_file,

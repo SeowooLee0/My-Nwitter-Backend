@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import { config } from "../config/config";
+import { Bookmark } from "./bookmark";
 import { Comments } from "./comments";
 import { Follow } from "./follow";
 import { Likes } from "./like";
@@ -17,7 +18,7 @@ const development = new Sequelize({
   timezone: config.development.timezone,
   dialectOptions: config.development.dialectOptions,
   logging: false,
-  models: [Tweets, Users, Comments, Likes, SocketId, Follow],
+  models: [Tweets, Users, Comments, Likes, SocketId, Follow, Bookmark],
 });
 
 const test = new Sequelize({
@@ -38,6 +39,6 @@ const test = new Sequelize({
 //   as: "landings",
 // });
 
-development.addModels([Users, Tweets, Comments, Likes, Message]);
+development.addModels([Users, Tweets, Comments, Likes, Bookmark]);
 
 export default { development, test };
