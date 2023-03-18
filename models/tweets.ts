@@ -66,6 +66,12 @@ export class Tweets extends Model {
   })
   write_date!: string;
 
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true,
+  })
+  reply_tweet_id!: IntegerDataType;
+
   @BelongsTo(() => Users)
   user!: Users;
 
@@ -76,4 +82,6 @@ export class Tweets extends Model {
   like!: Likes[];
   @HasMany(() => Bookmark)
   bookmark!: Bookmark[];
+  // @HasMany(() => Retweet)
+  // retweet!: Retweet[];
 }

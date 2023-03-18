@@ -25,6 +25,12 @@ export class Bookmark extends Model {
   })
   id!: IntegerDataType;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  content!: string;
+
   @ForeignKey(() => Tweets)
   @Column({
     type: DataType.INTEGER,
