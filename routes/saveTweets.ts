@@ -26,6 +26,7 @@ router.post(
           content: req.body.content,
           tag: req.body.tag,
           write_date: sequelize.development.literal(`now()`),
+          reply_tweet_id: req.body.reply_tweet_id,
         }).then(async (result) => {
           console.log(result);
           res.status(201).json(result);

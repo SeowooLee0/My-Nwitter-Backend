@@ -85,10 +85,12 @@ router.get(
           user_id: d.user_id,
           write_date: d.write_date,
           upload_file: d.upload_file,
+          reply_tweet_id: d.reply_tweet_id,
           is_like: isLike,
           is_bookmark: isBookmark,
           comment: [],
           is_opened: false,
+          retweet_opened: false,
         };
         // if (
         //   d.like.find((l: any) => {
@@ -191,6 +193,7 @@ router.get(
           user_id: d.user_id,
           write_date: d.write_date,
           upload_file: d.upload_file,
+          reply_tweet_id: d.reply_tweet_id,
           is_like: isLike,
           is_bookmark: isBookmark,
           comment: [],
@@ -274,10 +277,12 @@ router.get(
           user_id: d.user_id,
           write_date: d.write_date,
           upload_file: d.upload_file,
+          reply_tweet_id: d.reply_tweet_id,
           is_like: isLike,
           is_bookmark: isBookmark,
           comment: [],
           is_opened: false,
+          retweet_opened: false,
         };
       });
     });
@@ -355,6 +360,7 @@ router.get(
           tag: d.tag,
           user_id: d.user_id,
           write_date: d.write_date,
+          reply_tweet_id: d.reply_tweet_id,
           is_like: isLike,
           is_bookmark: isBookmark,
           comment: [],
