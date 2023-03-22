@@ -29,8 +29,10 @@ app.use(
   cors({
     origin: [
       "http://localhost:8080",
-      "https://hidden-howl-378706.du.r.appspot.com",
+      "https://hidden-howl-378706.du.r.appspot.com/",
+      "*",
     ],
+
     credentials: true,
   })
 );
@@ -82,7 +84,7 @@ io.on("connection", (socket: any) => {
         }
       })
     );
-
+    console.log(respondData);
     io.to(socket.id).emit("RESPOND_DATA", respondData);
     // let roomId = await redisCli.MGET(...keys);
   });
@@ -140,6 +142,7 @@ io.on("connection", (socket: any) => {
       "currentUser",
       `${receiveUser}`
     );
+
     console.log(checkUserExist);
     let messageData = {
       send: `${m.id}`,
@@ -152,6 +155,26 @@ io.on("connection", (socket: any) => {
 
     let score = Number(m.score);
     const nowDate = new Date();
+
+    const findData = await redisCli.KEYS(`roomId:*${m.id}*`);
+    let respondData: any = [];
+    await Promise.all(
+      findData.map(async (t: any) => {
+        console.log(t);
+        let roomId = await redisCli.GET(`${t}`);
+        let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
+
+        console.log(chatData[0]);
+        if (chatData[0] === undefined) {
+          return redisCli.DEL(t);
+        } else {
+          const change = JSON.parse(chatData);
+          return respondData.push(change);
+        }
+      })
+    );
+
+    io.to(socket.id).emit("RESPOND_DATA", respondData);
 
     if (checkUserExist === 1) {
       let id = m.id;
@@ -169,6 +192,27 @@ io.on("connection", (socket: any) => {
         date,
         data,
       });
+      if (m.id !== m.receiveUser) {
+        const findData = await redisCli.KEYS(`roomId:*${m.receiveUser}*`);
+        let respondData: any = [];
+        await Promise.all(
+          findData.map(async (t: any) => {
+            console.log(t);
+            let roomId = await redisCli.GET(`${t}`);
+            let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
+
+            console.log(chatData[0]);
+            if (chatData[0] === undefined) {
+              return redisCli.DEL(t);
+            } else {
+              const change = JSON.parse(chatData);
+              return respondData.push(change);
+            }
+          })
+        );
+      }
+
+      io.to(socket.id).emit("RESPOND_DATA", respondData);
 
       // console.log("전송");
     } else {
@@ -217,7 +261,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookiePaser());
 app.use("/static", express.static(__dirname + "/public/uploads"));
-console.log(__dirname + "/public/uploads");
+// console.log(__dirname + "/public/uploads");
 // app.get(/^(?!.*_ah).*$/, (req, res, next) => {});
 
 app.get(
@@ -266,6 +310,9 @@ app.use("/saveComments", saveComments);
 
 const saveLike = require("../routes/saveLike");
 app.use("/saveLike", saveLike);
+
+const saveBookmark = require("../routes/saveBookmark");
+app.use("/saveBookmark", saveBookmark);
 
 const register = require("../routes/register");
 app.use("/register", register);
