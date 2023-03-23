@@ -9,6 +9,7 @@ import {
 } from "sequelize-typescript";
 import { IntegerDataType, Optional } from "sequelize/types";
 import { Json } from "sequelize/types/utils";
+import { Bookmark } from "./bookmark";
 import { Tweets } from "./tweets";
 
 @Table({
@@ -26,6 +27,7 @@ export class Likes extends Model {
   id!: IntegerDataType;
 
   @ForeignKey(() => Tweets)
+  @ForeignKey(() => Bookmark)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -41,4 +43,7 @@ export class Likes extends Model {
 
   @BelongsTo(() => Tweets)
   tweets!: Tweets;
+
+  @BelongsTo(() => Bookmark)
+  bookmark!: Bookmark[];
 }

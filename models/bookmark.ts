@@ -9,6 +9,8 @@ import {
 } from "sequelize-typescript";
 import { IntegerDataType, Optional } from "sequelize/types";
 import { Json } from "sequelize/types/utils";
+import { Comments } from "./comments";
+import { Likes } from "./like";
 import { Tweets } from "./tweets";
 
 @Table({
@@ -46,4 +48,10 @@ export class Bookmark extends Model {
 
   @BelongsTo(() => Tweets)
   tweets!: Tweets;
+
+  @HasMany(() => Comments)
+  comment!: Comments[];
+
+  @HasMany(() => Likes)
+  like!: Likes[];
 }

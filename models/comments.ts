@@ -8,6 +8,7 @@ import {
   BelongsTo,
 } from "sequelize-typescript";
 import { IntegerDataType, Optional } from "sequelize/types";
+import { Bookmark } from "./bookmark";
 import { Tweets } from "./tweets";
 
 @Table({
@@ -31,6 +32,7 @@ export class Comments extends Model {
   email!: string;
 
   @ForeignKey(() => Tweets)
+  @ForeignKey(() => Bookmark)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -52,4 +54,7 @@ export class Comments extends Model {
 
   @BelongsTo(() => Tweets)
   tweets!: Tweets;
+
+  @BelongsTo(() => Bookmark)
+  bookmark!: Bookmark[];
 }
