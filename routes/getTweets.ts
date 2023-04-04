@@ -86,14 +86,14 @@ router.get(
             let RLike = false;
             let RBookmark = false;
             if (
-              d.like.some((i: any) => {
+              t.like.some((i: any) => {
                 return i.user_id === currentUser;
               })
             ) {
               RLike = true;
             }
             if (
-              d.bookmark.some((i: any) => {
+              t.bookmark.some((i: any) => {
                 return i.user_id === currentUser;
               })
             ) {
@@ -116,7 +116,7 @@ router.get(
               is_opened: false,
               retweet_opened: false,
             };
-            console.log(data);
+
             retweet_data.push(data);
           });
         }
@@ -203,49 +203,87 @@ router.get(
       return r.user_id;
     });
 
-    const bookmarkData = await Tweets.findAll({
-      include: [Likes, Bookmark, Comments],
+    const bookmarkData = await Bookmark.findAll({
+      include: [Likes, Tweets, Comments],
 
       where: {
-        [Op.or]: [{ user_id: { [Op.like]: [`${currentUser}`] } }],
+        user_id: currentUser,
       },
-    }).then((d: any) => {
-      return d.map((d: any) => {
-        let isLike = false;
-        let isBookmark = false;
+    }).then(async (d: any) => {
+      const results = await Promise.all(
+        d.map(async (d: any) => {
+          let isLike = false;
+          let isBookmark = true;
+          let retweet_data: any = [];
+          if (d.tweets.reply_tweet_id !== null) {
+            const t: any = await Tweets.findOne({
+              include: [Likes, Bookmark, Comments],
+              where: { tweet_id: d.tweets.reply_tweet_id },
+            });
+            let RLike = false;
+            let RBookmark = false;
+            if (
+              t.like.some((i: any) => {
+                return i.user_id === currentUser;
+              })
+            ) {
+              RLike = true;
+            }
+            if (
+              t.bookmark.some((i: any) => {
+                return i.user_id === currentUser;
+              })
+            ) {
+              RBookmark = true;
+            }
+            let data = {
+              tweet_id: t.tweet_id,
+              content: t.content,
+              email: t.email,
+              like: t.like,
+              tag: t.tag,
+              user_id: t.user_id,
+              write_date: t.write_date,
+              upload_file: t.upload_file,
+              reply_tweet_id: t.reply_tweet_id,
+              is_like: RLike,
+              is_bookmark: RBookmark,
+              comment: [],
+              is_opened: false,
+              retweet_opened: false,
+            };
 
-        if (
-          d.like.some((i: any) => {
-            return i.user_id === currentUser;
-          })
-        ) {
-          isLike = true;
-        }
+            retweet_data.push(data);
+          }
+          if (
+            d.like.some((i: any) => {
+              return i.user_id === currentUser;
+            })
+          ) {
+            isLike = true;
+          }
 
-        if (
-          d.bookmark.some((i: any) => {
-            return i.user_id === currentUser;
-          })
-        ) {
-          isBookmark = true;
-        }
+          return {
+            tweet_id: d.tweets.tweet_id,
+            content: d.tweets.content,
+            email: d.tweets.email,
+            like: d.like,
+            tag: d.tweets.tag,
+            user_id: d.tweets.user_id,
+            write_date: d.tweets.write_date,
+            upload_file: d.tweets.upload_file,
+            reply_tweet_id: d.tweets.reply_tweet_id,
+            is_like: isLike,
+            is_bookmark: isBookmark,
+            comment: [],
+            is_opened: false,
+            retweet_opened: false,
+            retweet_data: retweet_data,
+          };
+        })
+      );
 
-        return {
-          tweet_id: d.tweet_id,
-          content: d.content,
-          email: d.email,
-          like: d.like,
-          tag: d.tag,
-          user_id: d.user_id,
-          write_date: d.write_date,
-          upload_file: d.upload_file,
-          reply_tweet_id: d.reply_tweet_id,
-          is_like: isLike,
-          is_bookmark: isBookmark,
-          comment: [],
-          is_opened: false,
-        };
-      });
+      return results;
     });
     res.status(200).json(bookmarkData);
   }
@@ -283,6 +321,7 @@ router.get(
     }).then((r: any) => {
       return r.user_id;
     });
+
     const topUser = await Tweets.findAll({
       include: [Likes, Comments, Bookmark],
       offset: offset,
@@ -293,45 +332,92 @@ router.get(
           { tag: { [Op.like]: [`%${search}%`] } },
         ],
       },
-    }).then((d: any) => {
-      return d.map((d: any) => {
-        let isLike = false;
-        let isBookmark = false;
+    }).then(async (d: any) => {
+      // let retweet_data: any = [];
+      const results = await Promise.all(
+        //pending상태가 아니라 제대로 된 데이터를 다 받아오고 return
+        d.map(async (d: any) => {
+          let isLike = false;
+          let isBookmark = false;
+          let retweet_data: any = [];
+          if (d.reply_tweet_id !== null) {
+            const t: any = await Tweets.findOne({
+              include: [Likes, Bookmark, Comments],
+              where: { tweet_id: d.reply_tweet_id },
+            });
+            let RLike = false;
+            let RBookmark = false;
+            if (
+              t.like.some((i: any) => {
+                return i.user_id === currentUser;
+              })
+            ) {
+              RLike = true;
+            }
+            if (
+              t.bookmark.some((i: any) => {
+                return i.user_id === currentUser;
+              })
+            ) {
+              RBookmark = true;
+            }
+            let data = {
+              tweet_id: t.tweet_id,
+              content: t.content,
+              email: t.email,
+              like: t.like,
+              tag: t.tag,
+              user_id: t.user_id,
+              write_date: t.write_date,
+              upload_file: t.upload_file,
+              reply_tweet_id: t.reply_tweet_id,
+              is_like: RLike,
+              is_bookmark: RBookmark,
+              comment: [],
+              is_opened: false,
+              retweet_opened: false,
+            };
 
-        if (
-          d.like.some((i: any) => {
-            return i.user_id === currentUser;
-          })
-        ) {
-          isLike = true;
-        }
+            retweet_data.push(data);
+          }
+          if (
+            d.like.some((i: any) => {
+              return i.user_id === currentUser;
+            })
+          ) {
+            isLike = true;
+          }
 
-        if (
-          d.bookmark.some((i: any) => {
-            return i.user_id === currentUser;
-          })
-        ) {
-          isBookmark = true;
-        }
+          if (
+            d.bookmark.some((i: any) => {
+              return i.user_id === currentUser;
+            })
+          ) {
+            isBookmark = true;
+          }
+          return {
+            tweet_id: d.tweet_id,
+            content: d.content,
+            email: d.email,
+            like: d.like,
+            tag: d.tag,
+            user_id: d.user_id,
+            write_date: d.write_date,
+            upload_file: d.upload_file,
+            reply_tweet_id: d.reply_tweet_id,
+            is_like: isLike,
+            is_bookmark: isBookmark,
+            comment: [],
+            is_opened: false,
+            retweet_opened: false,
+            retweet_data: retweet_data,
+          };
+        })
+      );
 
-        return {
-          tweet_id: d.tweet_id,
-          content: d.content,
-          email: d.email,
-          like: d.like,
-          tag: d.tag,
-          user_id: d.user_id,
-          write_date: d.write_date,
-          upload_file: d.upload_file,
-          reply_tweet_id: d.reply_tweet_id,
-          is_like: isLike,
-          is_bookmark: isBookmark,
-          comment: [],
-          is_opened: false,
-          retweet_opened: false,
-        };
-      });
+      return results;
     });
+
     res.status(200).json({
       data: topUser,
       count: count,
@@ -377,45 +463,89 @@ router.get(
         ],
       },
       order: [["tweet_id", "DESC"]],
-    }).then((d: any) => {
-      return d.map((d: any) => {
-        let isLike = false;
-        let isBookmark = false;
+    }).then(async (d: any) => {
+      const results = await Promise.all(
+        d.map(async (d: any) => {
+          let isLike = false;
+          let isBookmark = false;
+          let retweet_data: any = [];
+          if (d.reply_tweet_id !== null) {
+            const t: any = await Tweets.findOne({
+              include: [Likes, Bookmark, Comments],
+              where: { tweet_id: d.reply_tweet_id },
+            });
+            let RLike = false;
+            let RBookmark = false;
+            if (
+              t.like.some((i: any) => {
+                return i.user_id === currentUser;
+              })
+            ) {
+              RLike = true;
+            }
+            if (
+              t.bookmark.some((i: any) => {
+                return i.user_id === currentUser;
+              })
+            ) {
+              RBookmark = true;
+            }
+            let data = {
+              tweet_id: t.tweet_id,
+              content: t.content,
+              email: t.email,
+              like: t.like,
+              tag: t.tag,
+              user_id: t.user_id,
+              write_date: t.write_date,
+              upload_file: t.upload_file,
+              reply_tweet_id: t.reply_tweet_id,
+              is_like: RLike,
+              is_bookmark: RBookmark,
+              comment: [],
+              is_opened: false,
+              retweet_opened: false,
+            };
 
-        if (
-          d.like.some((i: any) => {
-            return i.user_id === currentUser;
-          })
-        ) {
-          isLike = true;
-        }
+            retweet_data.push(data);
+          }
+          if (
+            d.like.some((i: any) => {
+              return i.user_id === currentUser;
+            })
+          ) {
+            isLike = true;
+          }
 
-        if (
-          d.bookmark.some((i: any) => {
-            return i.user_id === currentUser;
-          })
-        ) {
-          isBookmark = true;
-        }
+          if (
+            d.bookmark.some((i: any) => {
+              return i.user_id === currentUser;
+            })
+          ) {
+            isBookmark = true;
+          }
+          return {
+            tweet_id: d.tweet_id,
+            content: d.content,
+            email: d.email,
+            like: d.like,
+            tag: d.tag,
+            user_id: d.user_id,
+            write_date: d.write_date,
+            upload_file: d.upload_file,
+            reply_tweet_id: d.reply_tweet_id,
+            is_like: isLike,
+            is_bookmark: isBookmark,
+            comment: [],
+            is_opened: false,
+            retweet_opened: false,
+            retweet_data: retweet_data,
+          };
+        })
+      );
 
-        return {
-          tweet_id: d.tweet_id,
-          content: d.content,
-          email: d.email,
-          like: d.like,
-          tag: d.tag,
-          user_id: d.user_id,
-          write_date: d.write_date,
-          reply_tweet_id: d.reply_tweet_id,
-          is_like: isLike,
-          is_bookmark: isBookmark,
-          comment: [],
-          is_opened: false,
-          upload_file: d.upload_file,
-        };
-      });
+      return results;
     });
-
     res.status(200).json({
       data: latestData,
       count: count,

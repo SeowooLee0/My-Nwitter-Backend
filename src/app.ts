@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import sequelize from "../models/index";
+
 import { Tweets } from "../models/tweets";
 import bodyParser from "body-parser";
 import cookiePaser from "cookie-parser";
@@ -282,17 +283,6 @@ app.get(
 const getTweets = require("../routes/getTweets");
 app.use("/getTweets", getTweets);
 
-const getSelectCurrentTweets = require("../routes/getTweets");
-app.use("/getTweets/select", getSelectCurrentTweets);
-
-const getTopTweets = require("../routes/getTweets");
-app.use("/getTweets/top", getTopTweets);
-
-const getLatestTweets = require("../routes/getTweets");
-app.use("/getTweets/latest", getLatestTweets);
-const getPeopleData = require("../routes/getTweets");
-app.use("/getTweets/people", getPeopleData);
-
 const getUsers = require("../routes/getUsers");
 app.use("/getUsers", getUsers);
 
@@ -345,6 +335,7 @@ server.listen(port, async () => {
   🛡️  Server listening on port: 1234🛡️
   ################################################
 `);
+
   await sequelize.development
     .sync()
     .then(() => {
