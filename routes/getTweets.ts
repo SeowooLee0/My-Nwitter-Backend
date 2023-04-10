@@ -49,7 +49,7 @@ router.get(
     }
 
     const selectCurrentTweets = await Tweets.findAll({
-      include: [Likes, Bookmark, Comments],
+      include: [Likes, Bookmark, Comments, Users],
       offset: offset,
       limit: 10,
     }).then((d: any) => {
@@ -80,7 +80,7 @@ router.get(
 
         if (d.reply_tweet_id !== null) {
           Tweets.findOne({
-            include: [Likes, Bookmark, Comments],
+            include: [Likes, Bookmark, Comments, Users],
             where: { tweet_id: d.reply_tweet_id },
           }).then((t: any) => {
             let RLike = false;
@@ -102,6 +102,7 @@ router.get(
 
             let data = {
               tweet_id: t.tweet_id,
+              profile: t.user.profile,
               content: t.content,
               email: t.email,
               like: t.like,
@@ -122,6 +123,7 @@ router.get(
         }
         return {
           tweet_id: d.tweet_id,
+          profile: d.user.profile,
           content: d.content,
           email: d.email,
           like: d.like,
@@ -204,7 +206,7 @@ router.get(
     });
 
     const bookmarkData = await Bookmark.findAll({
-      include: [Likes, Tweets, Comments],
+      include: [Likes, Tweets, Comments, Users],
 
       where: {
         user_id: currentUser,
@@ -217,7 +219,7 @@ router.get(
           let retweet_data: any = [];
           if (d.tweets.reply_tweet_id !== null) {
             const t: any = await Tweets.findOne({
-              include: [Likes, Bookmark, Comments],
+              include: [Likes, Bookmark, Comments, Users],
               where: { tweet_id: d.tweets.reply_tweet_id },
             });
             let RLike = false;
@@ -238,6 +240,7 @@ router.get(
             }
             let data = {
               tweet_id: t.tweet_id,
+              profile: t.user.profile,
               content: t.content,
               email: t.email,
               like: t.like,
@@ -265,6 +268,7 @@ router.get(
 
           return {
             tweet_id: d.tweets.tweet_id,
+            profile: d.tweets.user.profile,
             content: d.tweets.content,
             email: d.tweets.email,
             like: d.like,
@@ -323,7 +327,7 @@ router.get(
     });
 
     const topUser = await Tweets.findAll({
-      include: [Likes, Comments, Bookmark],
+      include: [Likes, Comments, Bookmark, Users],
       offset: offset,
       limit: 10,
       where: {
@@ -342,7 +346,7 @@ router.get(
           let retweet_data: any = [];
           if (d.reply_tweet_id !== null) {
             const t: any = await Tweets.findOne({
-              include: [Likes, Bookmark, Comments],
+              include: [Likes, Bookmark, Comments,Users],
               where: { tweet_id: d.reply_tweet_id },
             });
             let RLike = false;
@@ -363,8 +367,10 @@ router.get(
             }
             let data = {
               tweet_id: t.tweet_id,
+              profile: t.user.profile,
               content: t.content,
               email: t.email,
+
               like: t.like,
               tag: t.tag,
               user_id: t.user_id,
@@ -397,6 +403,7 @@ router.get(
           }
           return {
             tweet_id: d.tweet_id,
+            profile: d.user.profile,
             content: d.content,
             email: d.email,
             like: d.like,
@@ -453,7 +460,7 @@ router.get(
       return r.user_id;
     });
     const latestData = await Tweets.findAll({
-      include: [Likes, Comments, Bookmark],
+      include: [Likes, Comments, Bookmark,Users],
       offset: offset,
       limit: 10,
       where: {
@@ -492,6 +499,7 @@ router.get(
             }
             let data = {
               tweet_id: t.tweet_id,
+              profile: t.user.profile,
               content: t.content,
               email: t.email,
               like: t.like,
@@ -526,9 +534,11 @@ router.get(
           }
           return {
             tweet_id: d.tweet_id,
+            profile: d.user.profile,
             content: d.content,
             email: d.email,
             like: d.like,
+
             tag: d.tag,
             user_id: d.user_id,
             write_date: d.write_date,
