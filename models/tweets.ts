@@ -67,6 +67,12 @@ export class Tweets extends Model {
   write_date!: string;
 
   @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  upload_file!: string;
+
+  @Column({
     type: DataType.INTEGER,
     allowNull: true,
   })
