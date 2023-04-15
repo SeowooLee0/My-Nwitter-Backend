@@ -12,6 +12,7 @@ import { Json } from "sequelize/types/utils";
 import { Comments } from "./comments";
 import { Likes } from "./like";
 import { Tweets } from "./tweets";
+import { Users } from "./user";
 
 @Table({
   timestamps: false,
@@ -40,6 +41,7 @@ export class Bookmark extends Model {
   })
   tweet_id!: IntegerDataType;
 
+  @ForeignKey(() => Users)
   @Column({
     type: DataType.INTEGER,
     allowNull: true,
@@ -48,6 +50,9 @@ export class Bookmark extends Model {
 
   @BelongsTo(() => Tweets)
   tweets!: Tweets;
+
+  @BelongsTo(() => Users)
+  users!: Users;
 
   @HasMany(() => Comments)
   comment!: Comments[];
