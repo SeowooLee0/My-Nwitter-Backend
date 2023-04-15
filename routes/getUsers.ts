@@ -1,4 +1,9 @@
 import express, { Request, Response, NextFunction, Router } from "express";
+import { Op } from "sequelize";
+import { Bookmark } from "../models/bookmark";
+import { Comments } from "../models/comments";
+import { Likes } from "../models/like";
+import { Tweets } from "../models/tweets";
 import { Users } from "../models/user";
 const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
 
@@ -11,7 +16,116 @@ router.get(
     const userData = await Users.findOne({
       where: { email: req.email },
     });
-    res.status(200).json({ data: userData, email: req.email });
+    let currentUser = userData?.user_id;
+    let retweet: any = [];
+    let likes: any = [];
+    const userTweets = await Tweets.findAll({
+      include: [Likes, Comments, Bookmark, Users],
+
+      where: {
+        email: req.email,
+      },
+    }).then(async (d: any) => {
+      const results = await Promise.all(
+        d.map(async (d: any) => {
+          let isLike = false;
+          let isBookmark = false;
+          let retweet_data: any = [];
+          if (d.reply_tweet_id !== null) {
+            const t: any = await Tweets.findOne({
+              include: [Likes, Bookmark, Comments, Users],
+              where: { tweet_id: d.reply_tweet_id },
+            });
+            let RLike = false;
+            let RBookmark = false;
+            if (
+              t.like.some((i: any) => {
+                return i.user_id === currentUser;
+              })
+            ) {
+              RLike = true;
+            }
+            if (
+              t.bookmark.some((i: any) => {
+                return i.user_id === currentUser;
+              })
+            ) {
+              RBookmark = true;
+            }
+            let data = {
+              tweet_id: t.tweet_id,
+              profile: t.user.profile,
+              content: t.content,
+              email: t.email,
+
+              like: t.like,
+              tag: t.tag,
+              user_id: t.user_id,
+              write_date: t.write_date,
+              upload_file: t.upload_file,
+              reply_tweet_id: t.reply_tweet_id,
+              is_like: RLike,
+              is_bookmark: RBookmark,
+              comment: [],
+              is_opened: false,
+              retweet_opened: false,
+            };
+
+            retweet_data.push(data);
+          }
+          if (
+            d.like.some((i: any) => {
+              return i.user_id === currentUser;
+            })
+          ) {
+            isLike = true;
+          }
+
+          if (
+            d.bookmark.some((i: any) => {
+              return i.user_id === currentUser;
+            })
+          ) {
+            isBookmark = true;
+          }
+          let finalData = {
+            tweet_id: d.tweet_id,
+            profile: d.user.profile,
+            content: d.content,
+            email: d.email,
+            like: d.like,
+            tag: d.tag,
+            user_id: d.user_id,
+            write_date: d.write_date,
+            upload_file: d.upload_file,
+            reply_tweet_id: d.reply_tweet_id,
+            is_like: isLike,
+            is_bookmark: isBookmark,
+            comment: [],
+            is_opened: false,
+            retweet_opened: false,
+            retweet_data: retweet_data,
+          };
+          if (d.reply_tweet_id !== null) {
+            retweet.push(finalData);
+          }
+          if (isLike == true) {
+            likes.push(finalData);
+          }
+          return finalData;
+        })
+      );
+
+      return results;
+    });
+
+    res.status(200).json({
+      data: userData,
+      tweetData: userTweets,
+      email: req.email,
+      retweet: retweet,
+      likes: likes,
+    });
   }
 );
 
