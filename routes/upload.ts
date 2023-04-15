@@ -80,12 +80,11 @@ router.post("/", (req: any, res: any) => {
 
 router.post(
   "/tweets",
-  // verifyAccessToken,
-  // verifyRefreshToken,
+
   async (req: any, res: any, next: NextFunction) => {
     // if (req.token === "login again") {
     //   res.json("login again");
-    // } else if (req.token === "refresh ok") {
+    // } else if (re=.token === "refresh ok") {
 
     uploadTweets(req, res, async (err: any) => {
       if (err) {
@@ -93,25 +92,26 @@ router.post(
         return res.json({ success: false, err });
       }
 
-      console.log(res.req.files.upload_file[0].filename, res.req.body.id);
+      console.log(res.req.files.upload_file[0].filename);
+
       await Users.findOne({
-        attributes: ["user_id"],
-        where: { email: res.req.body.id },
+        where: { user_id: req.body.id },
       }).then(async (result: any) => {
+        console.log(res.req.files.upload_file[0].filename);
         await Tweets.create({
           user_id: result.user_id,
-          email: res.req.body.id,
-          content: res.req.body.tweet,
-          tag: [res.req.body.tag],
+          email: result.email,
+          content: req.body.tweet,
+          tag: [req.body.tag],
           upload_file: res.req.files.upload_file[0].filename,
           write_date: sequelize.development.literal(`now()`),
-        }).then(async (result) => {
-          console.log(result);
-          res.status(201).json(result);
+        }).then(async (r) => {
+          console.log(r);
+          res.status(201).json(r);
           // res.status(201).json(result);
           // console.log(result.tweet_id);
           await Likes.create({
-            tweet_id: result.tweet_id,
+            tweet_id: r.tweet_id,
           });
         });
       });

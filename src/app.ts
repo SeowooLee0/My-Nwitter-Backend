@@ -261,7 +261,7 @@ io.on("connection", (socket: any) => {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookiePaser());
-app.use("/static", express.static(__dirname + "/public/uploads"));
+app.use("/static", express.static(__dirname + "/public"));
 // console.log(__dirname + "/public/uploads");
 // app.get(/^(?!.*_ah).*$/, (req, res, next) => {});
 
