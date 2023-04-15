@@ -206,14 +206,20 @@ router.get(
     });
 
     const bookmarkData = await Bookmark.findAll({
-      include: [Likes, Tweets, Comments, Users],
+      include: [Tweets, Comments, Users],
 
       where: {
         user_id: currentUser,
       },
     }).then(async (d: any) => {
+      console.log(d);
       const results = await Promise.all(
         d.map(async (d: any) => {
+          const like: any = await Likes.findAll({
+            where: {
+              tweet_id: d.tweet_id,
+            },
+          });
           let isLike = false;
           let isBookmark = true;
           let retweet_data: any = [];
@@ -222,6 +228,7 @@ router.get(
               include: [Likes, Bookmark, Comments, Users],
               where: { tweet_id: d.tweets.reply_tweet_id },
             });
+            console.log(t.user.profile);
             let RLike = false;
             let RBookmark = false;
             if (
@@ -259,7 +266,7 @@ router.get(
             retweet_data.push(data);
           }
           if (
-            d.like.some((i: any) => {
+            like.some((i: any) => {
               return i.user_id === currentUser;
             })
           ) {
@@ -268,10 +275,10 @@ router.get(
 
           return {
             tweet_id: d.tweets.tweet_id,
-            profile: d.tweets.user.profile,
+            profile: d.users.profile,
             content: d.tweets.content,
             email: d.tweets.email,
-            like: d.like,
+            like: like,
             tag: d.tweets.tag,
             user_id: d.tweets.user_id,
             write_date: d.tweets.write_date,
@@ -346,7 +353,7 @@ router.get(
           let retweet_data: any = [];
           if (d.reply_tweet_id !== null) {
             const t: any = await Tweets.findOne({
-              include: [Likes, Bookmark, Comments,Users],
+              include: [Likes, Bookmark, Comments, Users],
               where: { tweet_id: d.reply_tweet_id },
             });
             let RLike = false;
@@ -460,7 +467,7 @@ router.get(
       return r.user_id;
     });
     const latestData = await Tweets.findAll({
-      include: [Likes, Comments, Bookmark,Users],
+      include: [Likes, Comments, Bookmark, Users],
       offset: offset,
       limit: 10,
       where: {
