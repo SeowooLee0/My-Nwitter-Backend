@@ -17,11 +17,15 @@ router.get(
       where: { email: req.email },
     });
     let currentUser = userData?.user_id;
-    let retweet: any = [];
+    console.log(res.req.query);
+    //리트윗한 데이터
+    let retweets: any = [];
+    //좋아요 누른 데이터
     let likes: any = [];
+
+    // 현재 로그인한 유저가 작성한 트윗 모두 가져오기
     const userTweets = await Tweets.findAll({
       include: [Likes, Comments, Bookmark, Users],
-
       where: {
         email: req.email,
       },
@@ -57,7 +61,6 @@ router.get(
               profile: t.user.profile,
               content: t.content,
               email: t.email,
-
               like: t.like,
               tag: t.tag,
               user_id: t.user_id,
@@ -106,25 +109,29 @@ router.get(
             retweet_opened: false,
             retweet_data: retweet_data,
           };
-          if (d.reply_tweet_id !== null) {
-            retweet.push(finalData);
+          if (res.req.query.type == "retweets") {
+            d.reply_tweet_id !== null && retweets.push(finalData);
           }
-          if (isLike == true) {
-            likes.push(finalData);
+          if (res.req.query.type == "likes") {
+            isLike == true && likes.push(finalData);
           }
+
           return finalData;
         })
       );
 
-      return results;
+      return (
+        (res.req.query.type == "tweets" && results) ||
+        (res.req.query.type == "retweets" && retweets) ||
+        (res.req.query.type == "likes" && likes)
+      );
     });
 
+    //데이터가 많으면 쉽지않다. api분리하거나 type에 따라서 ,
     res.status(200).json({
       data: userData,
       tweetData: userTweets,
       email: req.email,
-      retweet: retweet,
-      likes: likes,
     });
   }
 );
