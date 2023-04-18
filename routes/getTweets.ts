@@ -52,113 +52,116 @@ router.get(
       include: [Likes, Bookmark, Comments, Users],
       offset: offset,
       limit: 10,
-    }).then((d: any) => {
-      return d.map((d: any) => {
-        let isLike = false;
-        let isBookmark = false;
-        let retweet_data: any = [];
+    }).then(async (d: any) => {
+      return await Promise.all(
+        d.map(async (d: any) => {
+          let isLike = false;
+          let isBookmark = false;
+          let retweet_data: any = [];
 
-        if (
-          d.like.some((i: any) => {
-            return i.user_id === currentUser;
-          })
+          if (
+            d.like.some((i: any) => {
+              return i.user_id === currentUser;
+            })
 
-          // d.like.find((l: any) => {
-          //   return l.user_id === currentUser;
-          // })
-        ) {
-          isLike = true;
-        }
+            // d.like.find((l: any) => {
+            //   return l.user_id === currentUser;
+            // })
+          ) {
+            isLike = true;
+          }
 
-        if (
-          d.bookmark.some((i: any) => {
-            return i.user_id === currentUser;
-          })
-        ) {
-          isBookmark = true;
-        }
+          if (
+            d.bookmark.some((i: any) => {
+              return i.user_id === currentUser;
+            })
+          ) {
+            isBookmark = true;
+          }
 
-        if (d.reply_tweet_id !== null) {
-          Tweets.findOne({
-            include: [Likes, Bookmark, Comments, Users],
-            where: { tweet_id: d.reply_tweet_id },
-          }).then((t: any) => {
-            let RLike = false;
-            let RBookmark = false;
-            if (
-              t.like.some((i: any) => {
-                return i.user_id === currentUser;
-              })
-            ) {
-              RLike = true;
-            }
-            if (
-              t.bookmark.some((i: any) => {
-                return i.user_id === currentUser;
-              })
-            ) {
-              RBookmark = true;
-            }
+          if (d.reply_tweet_id !== null) {
+            await Tweets.findOne({
+              include: [Likes, Bookmark, Comments, Users],
+              where: { tweet_id: d.reply_tweet_id },
+            }).then( (t: any) => {
+              let RLike = false;
+              let RBookmark = false;
+              if (
+                t.like.some((i: any) => {
+                  return i.user_id === currentUser;
+                })
+              ) {
+                RLike = true;
+              }
+              if (
+                t.bookmark.some((i: any) => {
+                  return i.user_id === currentUser;
+                })
+              ) {
+                RBookmark = true;
+              }
 
-            let data = {
-              tweet_id: t.tweet_id,
-              profile: t.user.profile,
-              content: t.content,
-              email: t.email,
-              like: t.like,
-              tag: t.tag,
-              user_id: t.user_id,
-              write_date: t.write_date,
-              upload_file: t.upload_file,
-              reply_tweet_id: t.reply_tweet_id,
-              is_like: RLike,
-              is_bookmark: RBookmark,
-              comment: [],
-              is_opened: false,
-              retweet_opened: false,
-            };
+              let data = {
+                tweet_id: t.tweet_id,
+                profile: t.user.profile,
+                content: t.content,
+                email: t.email,
+                like: t.like,
+                tag: t.tag,
+                user_id: t.user_id,
+                write_date: t.write_date,
+                upload_file: t.upload_file,
+                reply_tweet_id: t.reply_tweet_id,
+                is_like: RLike,
+                is_bookmark: RBookmark,
+                comment: [],
+                is_opened: false,
+                retweet_opened: false,
+              };
 
-            retweet_data.push(data);
-          });
-        }
-        return {
-          tweet_id: d.tweet_id,
-          profile: d.user.profile,
-          content: d.content,
-          email: d.email,
-          like: d.like,
-          tag: d.tag,
-          user_id: d.user_id,
-          write_date: d.write_date,
-          upload_file: d.upload_file,
-          reply_tweet_id: d.reply_tweet_id,
-          is_like: isLike,
-          is_bookmark: isBookmark,
-          comment: [],
-          is_opened: false,
-          retweet_opened: false,
-          retweet_data: retweet_data,
-        };
+          retweet_data.push(data);
+            });
+          }
 
-        // if (
-        //   d.like.find((l: any) => {
-        //     return l.user_id === currentUser;
-        //   }) == undefined
-        // ) {
-        //   return {
-        //     tweet_id: d.tweet_id,
-        //     content: d.content,
-        //     email: d.email,
-        //     like: d.like,
-        //     tag: d.tag,
-        //     user_id: d.user_id,
-        //     write_date: d.write_date,
-        //     is_like: false,
-        //     comment: [],
-        //     is_opened: false,
-        //   };
-        // }
-      });
+          return {
+            tweet_id: d.tweet_id,
+            profile: d.user.profile,
+            content: d.content,
+            email: d.email,
+            like: d.like,
+            tag: d.tag,
+            user_id: d.user_id,
+            write_date: d.write_date,
+            upload_file: d.upload_file,
+            reply_tweet_id: d.reply_tweet_id,
+            is_like: isLike,
+            is_bookmark: isBookmark,
+            comment: [],
+            is_opened: false,
+            retweet_opened: false,
+            retweet_data: retweet_data,
+          };
+
+          // if (
+          //   d.like.find((l: any) => {
+          //     return l.user_id === currentUser;
+          //   }) == undefined
+          // ) {
+          //   return {
+          //     tweet_id: d.tweet_id,
+          //     content: d.content,
+          //     email: d.email,
+          //     like: d.like,
+          //     tag: d.tag,
+          //     user_id: d.user_id,
+          //     write_date: d.write_date,
+          //     is_like: false,
+          //     comment: [],
+          //     is_opened: false,
+          //   };
+          // }
+        })
+      );
     });
 
     // let likeData = await Likes.findAll().then((Likes: any) => {
@@ -212,7 +215,6 @@ router.get(
         user_id: currentUser,
       },
     }).then(async (d: any) => {
-      console.log(d);
       const results = await Promise.all(
         d.map(async (d: any) => {
           const like: any = await Likes.findAll({
@@ -228,7 +230,7 @@ router.get(
               include: [Likes, Bookmark, Comments, Users],
               where: { tweet_id: d.tweets.reply_tweet_id },
             });
-            console.log(t.user.profile);
+
             let RLike = false;
             let RBookmark = false;
             if (
