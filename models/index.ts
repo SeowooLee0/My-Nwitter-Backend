@@ -8,9 +8,11 @@ import { Message } from "./message";
 import { SocketId } from "./socketId";
 import { Tweets } from "./tweets";
 import { Users } from "./user";
+import mysql2 from "mysql2";
 
 const development = new Sequelize({
   dialect: "mysql",
+  dialectModule: mysql2,
   host: config.development.host,
   username: config.development.username,
   password: config.development.password,
@@ -23,6 +25,7 @@ const development = new Sequelize({
 
 const test = new Sequelize({
   dialect: "mysql",
+  dialectModule: require("mysql2"),
   host: config.test.host,
   username: config.test.username,
   password: config.test.password,
