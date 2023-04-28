@@ -6,12 +6,7 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "src/app.ts"
-    }
-  ],
+
   "env": {
     "MYSQL_HOST": "127.0.0.1",
     "MYSQL_USER": "root",
