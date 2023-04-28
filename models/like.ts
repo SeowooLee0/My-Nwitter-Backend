@@ -6,6 +6,7 @@ import {
   HasMany,
   ForeignKey,
   BelongsTo,
+  BelongsToMany,
 } from "sequelize-typescript";
 import { IntegerDataType, Optional } from "sequelize/types";
 import { Json } from "sequelize/types/utils";
@@ -26,8 +27,8 @@ export class Likes extends Model {
   })
   id!: IntegerDataType;
 
-  @ForeignKey(() => Tweets)
   @ForeignKey(() => Bookmark)
+  @ForeignKey(() => Tweets)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
