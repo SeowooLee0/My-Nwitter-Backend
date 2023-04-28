@@ -11,5 +11,11 @@
       "src": "/(.*)",
       "dest": "src/app.ts"
     }
-  ]
+  ],
+  "env": {
+    "MYSQL_HOST": "127.0.0.1",
+    "MYSQL_USER": "root",
+    "MYSQL_PASSWORD": "tjdn0956",
+    "MYSQL_DATABASE": "sequelize"
+  }
 }
