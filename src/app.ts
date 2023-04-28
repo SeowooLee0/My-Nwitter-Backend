@@ -72,11 +72,9 @@ io.on("connection", (socket: any) => {
     let respondData: any = [];
     await Promise.all(
       findData.map(async (t: any) => {
-        console.log(t);
         let roomId = await redisCli.GET(`${t}`);
         let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
 
-        console.log(chatData[0]);
         if (chatData[0] === undefined) {
           return redisCli.DEL(t);
         } else {
@@ -85,7 +83,7 @@ io.on("connection", (socket: any) => {
         }
       })
     );
-    console.log(respondData);
+
     io.to(socket.id).emit("RESPOND_DATA", respondData);
     // let roomId = await redisCli.MGET(...keys);
   });
@@ -120,12 +118,10 @@ io.on("connection", (socket: any) => {
   });
 
   socket.on("START_CHAT", async (data: any) => {
-    console.log(data);
     const chatExist = await redisCli.EXISTS(`roomId:${data.users}`);
-    console.log(chatExist);
+
     if (chatExist == 1) {
       let roomId = await redisCli.GET(`roomId:${data.users}`);
-      console.log(`${data.users}`);
 
       const allData = await redisCli.ZRANGE(`${roomId}`, 0, -1);
 
@@ -144,7 +140,6 @@ io.on("connection", (socket: any) => {
       `${receiveUser}`
     );
 
-    console.log(checkUserExist);
     let messageData = {
       send: `${m.id}`,
       receive: `${m.receiveUser}`,
@@ -161,11 +156,9 @@ io.on("connection", (socket: any) => {
     let respondData: any = [];
     await Promise.all(
       findData.map(async (t: any) => {
-        console.log(t);
         let roomId = await redisCli.GET(`${t}`);
         let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
 
-        console.log(chatData[0]);
         if (chatData[0] === undefined) {
           return redisCli.DEL(t);
         } else {
@@ -184,7 +177,7 @@ io.on("connection", (socket: any) => {
       let roomId = await redisCli.GET(`roomId:${m.sortId}`);
       redisCli.ZADD(`${roomId}`, { score: score, value: change });
       const data = await redisCli.ZRANGE(`{roomId}`, 0, -1);
-      console.log("접속하고있음");
+
       // redis에 채팅 데이터 저장하기
 
       io.to(receiveUser).emit("RECEIVE_MESSAGE", {
@@ -198,11 +191,9 @@ io.on("connection", (socket: any) => {
         let respondData: any = [];
         await Promise.all(
           findData.map(async (t: any) => {
-            console.log(t);
             let roomId = await redisCli.GET(`${t}`);
             let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
 
-            console.log(chatData[0]);
             if (chatData[0] === undefined) {
               return redisCli.DEL(t);
             } else {

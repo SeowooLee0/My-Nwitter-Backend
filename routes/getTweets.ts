@@ -33,12 +33,10 @@ router.get(
   "/select",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    const currentUser: Users[] = await Users.findOne({
+    const currentUser: any = await Users.findOne({
       where: {
         email: req.email,
       },
-    }).then((r: any) => {
-      return r.user_id;
     });
 
     let pageNum = Number(res.req.query.pageCount);
@@ -49,7 +47,7 @@ router.get(
     }
 
     const selectCurrentTweets = await Tweets.findAll({
-      include: [Likes, Bookmark, Comments, Users],
+      include: [Likes, Bookmark, Users],
       offset: offset,
       limit: 10,
     }).then(async (d: any) => {
@@ -61,7 +59,7 @@ router.get(
 
           if (
             d.like.some((i: any) => {
-              return i.user_id === currentUser;
+              return i.user_id === currentUser.user_id;
             })
 
             // d.like.find((l: any) => {
@@ -73,7 +71,7 @@ router.get(
 
           if (
             d.bookmark.some((i: any) => {
-              return i.user_id === currentUser;
+              return i.user_id === currentUser.user_id;
             })
           ) {
             isBookmark = true;
@@ -81,21 +79,21 @@ router.get(
 
           if (d.reply_tweet_id !== null) {
             await Tweets.findOne({
-              include: [Likes, Bookmark, Comments, Users],
+              include: [Likes, Bookmark, Users],
               where: { tweet_id: d.reply_tweet_id },
-            }).then( (t: any) => {
+            }).then((t: any) => {
               let RLike = false;
               let RBookmark = false;
               if (
                 t.like.some((i: any) => {
-                  return i.user_id === currentUser;
+                  return i.user_id === currentUser.user_id;
                 })
               ) {
                 RLike = true;
               }
               if (
                 t.bookmark.some((i: any) => {
-                  return i.user_id === currentUser;
+                  return i.user_id === currentUser.user_id;
                 })
               ) {
                 RBookmark = true;
@@ -119,7 +117,7 @@ router.get(
                 retweet_opened: false,
               };
 
-          retweet_data.push(data);
+              retweet_data.push(data);
             });
           }
 
@@ -189,7 +187,8 @@ router.get(
     res.status(200).json({
       data: selectCurrentTweets,
       count,
-      user_id: currentUser,
+      user_id: currentUser.user_id,
+      profile: currentUser.profile,
       totalPageNumber: totalPageNumber,
       // dataLength: selectCurrentTweets.length,
     });
@@ -209,7 +208,7 @@ router.get(
     });
 
     const bookmarkData = await Bookmark.findAll({
-      include: [Tweets, Comments, Users],
+      include: [Tweets, Users],
 
       where: {
         user_id: currentUser,
@@ -227,7 +226,7 @@ router.get(
           let retweet_data: any = [];
           if (d.tweets.reply_tweet_id !== null) {
             const t: any = await Tweets.findOne({
-              include: [Likes, Bookmark, Comments, Users],
+              include: [Likes, Bookmark, Users],
               where: { tweet_id: d.tweets.reply_tweet_id },
             });
 
@@ -307,16 +306,16 @@ router.get(
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
     let pageNum = Number(res.req.query.pageCount); // 요청 페이지 넘버
+    const { search } = res.req.query;
     // console.log(pageNum);
     if (Number.isNaN(pageNum)) {
       pageNum == 0;
     }
+
     let offset = 0;
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
     }
-
-    const { search } = res.req.query;
 
     let count = await Tweets.count({
       where: {
@@ -336,7 +335,7 @@ router.get(
     });
 
     const topUser = await Tweets.findAll({
-      include: [Likes, Comments, Bookmark, Users],
+      include: [Likes, Bookmark, Users],
       offset: offset,
       limit: 10,
       where: {
@@ -355,7 +354,7 @@ router.get(
           let retweet_data: any = [];
           if (d.reply_tweet_id !== null) {
             const t: any = await Tweets.findOne({
-              include: [Likes, Bookmark, Comments, Users],
+              include: [Likes, Bookmark, Users],
               where: { tweet_id: d.reply_tweet_id },
             });
             let RLike = false;
@@ -469,7 +468,7 @@ router.get(
       return r.user_id;
     });
     const latestData = await Tweets.findAll({
-      include: [Likes, Comments, Bookmark, Users],
+      include: [Likes, Bookmark, Users],
       offset: offset,
       limit: 10,
       where: {
@@ -487,7 +486,7 @@ router.get(
           let retweet_data: any = [];
           if (d.reply_tweet_id !== null) {
             const t: any = await Tweets.findOne({
-              include: [Likes, Bookmark, Comments],
+              include: [Likes, Bookmark, Users],
               where: { tweet_id: d.reply_tweet_id },
             });
             let RLike = false;

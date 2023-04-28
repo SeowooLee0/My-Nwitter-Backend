@@ -1,5 +1,6 @@
 import { Table, Column, Model, DataType, HasMany } from "sequelize-typescript";
 import { IntegerDataType, Optional } from "sequelize/types";
+import { Bookmark } from "./bookmark";
 import { Follow } from "./follow";
 import { Tweets } from "./tweets";
 
@@ -47,6 +48,8 @@ export class Users extends Model {
   tweets!: Tweets[];
   @HasMany(() => Follow)
   follow!: Follow[];
+  @HasMany(() => Bookmark)
+  bookmark!: Bookmark[];
 }
 
 // Users.hasMany(Tweets, {

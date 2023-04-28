@@ -15,33 +15,30 @@ router.post(
   verifyAccessToken,
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    if (req.token === "refresh ok") {
-      await Users.findOne({
-        attributes: ["user_id"],
-        where: { email: req.email },
-      }).then(async (result: any) => {
-        await Tweets.create({
-          user_id: result.user_id,
-          email: req.email,
-          content: req.body.content,
-          tag: req.body.tag,
-          write_date: sequelize.development.literal(`now()`),
-          reply_tweet_id: req.body.reply_tweet_id,
-        }).then(async (result) => {
-          console.log(result);
-          res.status(201).json(result);
-          // res.status(201).json(result);
-          console.log(result.user_id);
-          await Likes.create({
-            tweet_id: result.tweet_id,
-          });
-          await Bookmark.create({
-            tweet_id: result.tweet_id,
-            user_id: null,
-          });
+    await Users.findOne({
+      attributes: ["user_id"],
+      where: { email: req.email },
+    }).then(async (result: any) => {
+      await Tweets.create({
+        user_id: result.user_id,
+        email: req.email,
+        content: req.body.content,
+        tag: req.body.tag,
+        write_date: sequelize.development.literal(`now()`),
+        reply_tweet_id: req.body.reply_tweet_id,
+      }).then(async (result) => {
+        res.status(201).json(result);
+        // res.status(201).json(result);
+
+        await Likes.create({
+          tweet_id: result.tweet_id,
+        });
+        await Bookmark.create({
+          tweet_id: result.tweet_id,
+          user_id: null,
         });
       });
-    }
+    });
   }
 );
 
@@ -50,7 +47,6 @@ router.post(
   verifyAccessToken,
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    console.log(req.body.tweetId);
     await Likes.update(
       {
         user_id: req.body.data,
