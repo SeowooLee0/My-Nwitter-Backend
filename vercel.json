@@ -21,5 +21,13 @@
     "REDIS_PORT": "10061",
     "REDIS_USERNAME": "default",
     "REDIS_PASSWORD": "LasBdVz4ABVmYUlVDyLL4rZI8fbnAlqL"
-  }
+  },
+  "middlewares": [
+    {
+      "handler": "cors",
+      "options": {
+        "origin": "*"
+      }
+    }
+  ]
 }
