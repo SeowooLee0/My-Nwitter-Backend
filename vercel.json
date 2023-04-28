@@ -16,6 +16,10 @@
     "MYSQL_HOST": "127.0.0.1",
     "MYSQL_USER": "root",
     "MYSQL_PASSWORD": "tjdn0956",
-    "MYSQL_DATABASE": "sequelize"
+    "MYSQL_DATABASE": "sequelize",
+    "REDIS_HOST": "edis-10061.c302.asia-northeast1-1.gce.cloud.redislabs.com",
+    "REDIS_PORT": "10061",
+    "REDIS_USERNAME": "default",
+    "REDIS_PASSWORD": "LasBdVz4ABVmYUlVDyLL4rZI8fbnAlqL"
   }
 }
