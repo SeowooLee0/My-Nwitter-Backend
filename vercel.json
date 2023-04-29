@@ -11,7 +11,8 @@
       "src": "/(.*)",
       "dest": "src/app.ts",
       "headers": {
-        "Access-Control-Allow-Origin": "*"
+        "Access-Control-Allow-Origin": "https://my-nwitter-b6v2.vercel.app, http://localhost:8080",
+        "Access-Control-Allow-Credentials": "true"
       }
     }
   ],
