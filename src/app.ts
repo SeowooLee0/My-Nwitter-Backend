@@ -28,7 +28,11 @@ interface data {
 
 app.use(
   cors({
-    origin: ["http://localhost:8080", "https://my-nwitter-b6v2.vercel.app/"],
+    origin: [
+      "http://localhost:8080",
+      "https://my-nwitter-b6v2.vercel.app/",
+      "https://my-nwitter.vercel.app/",
+    ],
 
     credentials: true,
   })
