@@ -18,7 +18,7 @@ const development = new Sequelize({
   password: config.development.password,
   database: config.development.database,
   timezone: config.development.timezone,
-  dialectOptions: config.development.dialectOptions,
+
   logging: false,
   models: [Tweets, Users, Comments, Likes, SocketId, Follow, Bookmark],
 });
