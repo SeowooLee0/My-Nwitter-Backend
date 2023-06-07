@@ -22,16 +22,14 @@ router.post(
       return r.user_id;
     });
 
-    if (req.token === "login again") {
-      res.json("login again");
-    } else if (req.token === "refresh ok") {
+   
       await Likes.create({
         tweet_id: req.body.tweet_id,
         user_id: currentUser,
       }).then((result) => {
         res.status(201).json(result);
       });
-    }
+    
   }
 );
 
@@ -48,9 +46,7 @@ router.post(
       return r.user_id;
     });
 
-    if (req.token === "login again") {
-      res.json("login again");
-    } else if (req.token === "refresh ok") {
+   
       await Likes.destroy({
         where: {
           tweet_id: req.body.tweet_id,
@@ -60,7 +56,7 @@ router.post(
         res.status(201).json(result);
       });
     }
-  }
+  
 );
 
 module.exports = router;
