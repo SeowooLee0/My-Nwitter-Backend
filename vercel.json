@@ -9,10 +9,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "src/app.ts",
-      "headers": {
-        "Access-Control-Allow-Origin": "https://my-nwitter.vercel.app"
-      }
+      "dest": "src/app.ts"
     }
   ],
   "env": {
