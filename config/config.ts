@@ -14,6 +14,7 @@ export const config = {
       dateStrings: true, // 가져올 때 string으로 가져오기
       typeCast: true,
     },
+    
   },
   // test: {
   //   username: process.env.DB_USERNAME,

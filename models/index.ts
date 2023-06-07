@@ -12,13 +12,13 @@ import mysql2 from "mysql2";
 
 const development = new Sequelize({
   dialect: "mysql",
-  // dialectModule: mysql2,
+  dialectModule: mysql2,
   host: config.development.host,
   username: config.development.username,
   password: config.development.password,
   database: config.development.database,
   timezone: config.development.timezone,
-  // dialectOptions: config.development.dialectOptions,
+  dialectOptions: config.development.dialectOptions,
   logging: false,
   models: [Tweets, Users, Comments, Likes, SocketId, Follow, Bookmark],
 });
