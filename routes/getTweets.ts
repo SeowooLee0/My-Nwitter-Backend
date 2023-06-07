@@ -39,8 +39,12 @@ router.get(
       },
     });
 
-    let pageNum = Number(res.req.query.pageCount);
-    // console.log(`pageNum = ${pageNum}`);
+    let pageNum = Number(res.req.query.pageParam);
+
+    console.log(res.req.query.pageParam);
+    // if (pageNum == undefined) {
+    //   pageNum = 1;
+    // }
     let offset = 0;
     if (pageNum > 1) {
       offset = 10 * (pageNum - 1);
@@ -48,6 +52,7 @@ router.get(
 
     const selectCurrentTweets = await Tweets.findAll({
       include: [Likes, Bookmark, Users],
+      order: [["tweet_id", "desc"]],
       offset: offset,
       limit: 10,
     }).then(async (d: any) => {
@@ -305,7 +310,7 @@ router.get(
   "/top",
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    let pageNum = Number(res.req.query.pageCount); // 요청 페이지 넘버
+    let pageNum = Number(res.req.query.currentPage); // 요청 페이지 넘버
     const { search } = res.req.query;
     // console.log(pageNum);
     if (Number.isNaN(pageNum)) {
