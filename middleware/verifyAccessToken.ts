@@ -7,7 +7,7 @@ module.exports.verifyAccessToken = (
   next: NextFunction
 ) => {
   const authorization: any = req.headers.authorization;
-
+  console.log(req.headers);
   const token = authorization.split("Bearer ")[1];
   // const token = authorization.split("Bearer ")[1];
 
@@ -18,6 +18,7 @@ module.exports.verifyAccessToken = (
     console.log(decoded);
   } catch (error: any) {
     return res.status(419).json({
+      data: req.headers,
       code: 419,
       message: "토큰이 만료되었습니다.",
     });
