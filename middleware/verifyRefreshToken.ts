@@ -18,7 +18,7 @@ module.exports.verifyRefreshToken = (
     req.token = "refresh ok";
     req.email = decoded.email;
   } catch (error: any) {
-    return res.status(500).send({ message: "login again" });
+    return res.status(500).send({ message: "login again", error });
   }
   next();
 };
