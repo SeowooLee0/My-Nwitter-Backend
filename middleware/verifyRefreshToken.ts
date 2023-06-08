@@ -10,6 +10,7 @@ module.exports.verifyRefreshToken = (
   next: NextFunction
 ) => {
   const token = req.cookies.refreshToken;
+  console.log(token);
   let decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
   try {

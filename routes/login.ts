@@ -39,11 +39,11 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 
     res
       .cookie("refreshToken", refreshToken, {
-        secure: true,
-        httpOnly: true,
+        // secure: true,
+        // httpOnly: true,
       })
       .cookie("accessToken", accessToken, {
-        secure: true,
+        // secure: true,
       })
       .status(200)
       .json({ message: "ok" });
