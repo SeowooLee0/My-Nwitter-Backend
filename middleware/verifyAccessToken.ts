@@ -7,7 +7,7 @@ module.exports.verifyAccessToken = (
   next: NextFunction
 ) => {
   const authorization: any = req.headers.authorization;
-  console.log(authorization);
+
   const token = authorization.split("Bearer ")[1];
   // const token = authorization.split("Bearer ")[1];
 
