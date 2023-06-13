@@ -10,11 +10,11 @@ module.exports.verifyAccessToken = (
   console.log(token);
   // const token = authorization.split("Bearer ")[1];
   // const token = authorization.split("Bearer ")[1];
-
+  let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+  console.log(decoded);
   try {
     let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.email = decoded.email;
-    console.log(decoded);
   } catch (error: any) {
     return res.status(419).json({
       data: req.headers,
