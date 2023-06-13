@@ -14,13 +14,15 @@ module.exports.verifyAccessToken = (
   // console.log(token, req.headers["x-vercel-proxy-signature"]);
   // const token = authorization.split("Bearer ")[1];
   // const token = authorization.split("Bearer ")[1];
-  let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+
   try {
-    console.log(`decoded=${decoded}`);
-    console.log(decoded, req.email);
+    let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.email = decoded.email;
   } catch (error: any) {
-    console.log(error);
+    let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    console.log(1, error);
+    console.log(2, decoded, token);
+    console.log(3, req.email);
     return res.status(419).json({
       data: req.headers,
       code: 419,
