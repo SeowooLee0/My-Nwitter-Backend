@@ -12,7 +12,7 @@ module.exports.verifyRefreshToken = (
   const token = req.cookies.refreshToken;
 
   let decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-  console.log(token, decoded);
+  console.log(req.email);
   try {
     jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
     req.token = "refresh ok";
