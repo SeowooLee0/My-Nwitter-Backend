@@ -15,7 +15,6 @@ import { Follow } from "../models/follow";
 import { Bookmark } from "../models/bookmark";
 import { DataType } from "sequelize-typescript";
 const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
-const { verifyAccessToken } = require("../middleware/");
 
 const router = express.Router();
 
