@@ -7,12 +7,8 @@ module.exports.verifyAccessToken = (
   next: NextFunction
 ) => {
   const authorization = req.headers["x-vercel-proxy-signature"];
-
-  const token: any = authorization.split("Bearer ")[1];
-  let decoded = jwt.verify(
-    JSON.stringify(token),
-    process.env.ACCESS_TOKEN_SECRET
-  );
+  const token = authorization.split("Bearer ")[1];
+  let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
 
   console.log(decoded);
   // console.log(token, req.headers["x-vercel-proxy-signature"]);
