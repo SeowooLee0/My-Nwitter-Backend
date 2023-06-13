@@ -15,7 +15,7 @@ import { Follow } from "../models/follow";
 import { Bookmark } from "../models/bookmark";
 import { DataType } from "sequelize-typescript";
 const { verifyRefreshToken } = require("../middleware/verifyRefreshToken");
-const { verifyAccessToken } = require("../middleware/verifyAccessToken");
+const { verifyAccessToken } = require("../middleware/");
 
 const router = express.Router();
 
@@ -32,7 +32,8 @@ router.get(
 
 router.get(
   "/select",
-  verifyAccessToken,
+
+  verifyRefreshToken,
 
   async (req: any, res: Response, next: NextFunction) => {
     const currentUser: any = await Users.findOne({
