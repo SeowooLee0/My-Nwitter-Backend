@@ -6,10 +6,9 @@ module.exports.verifyAccessToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const authorization: any =
-    req.headers["x-vercel-proxy-signature"].split(" ")[1];
-  console.log(authorization);
-  const token = authorization.split("Bearer ")[1];
+  const token: any = req.headers["x-vercel-proxy-signature"].split(" ")[1];
+
+  // const token = authorization.split("Bearer ")[1];
   // const token = authorization.split("Bearer ")[1];
 
   try {

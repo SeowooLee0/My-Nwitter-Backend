@@ -11,7 +11,6 @@ module.exports.verifyRefreshToken = (
 ) => {
   const token = req.cookies.refreshToken;
   console.log(token);
-  console.log(req.cookie, req.cookies);
 
   let decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 

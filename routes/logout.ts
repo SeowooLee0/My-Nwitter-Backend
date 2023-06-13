@@ -4,6 +4,6 @@ const router = express.Router();
 
 router.get("/", (req: Request, res: Response, next: NextFunction) => {
   res.clearCookie("refreshToken").redirect("/");
-  console.log(res.cookie);
+  console.log(res);
 });
 module.exports = router;
