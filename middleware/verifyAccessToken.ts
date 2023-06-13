@@ -9,7 +9,11 @@ module.exports.verifyAccessToken = (
   const authorization = req.headers["x-vercel-proxy-signature"];
 
   const token: any = authorization.split("Bearer ")[1];
-  let decoded = jwt.verify(JSON.parse(token), process.env.ACCESS_TOKEN_SECRET);
+  let decoded = jwt.verify(
+    JSON.stringify(token),
+    process.env.ACCESS_TOKEN_SECRET
+  );
+
   console.log(decoded);
   // console.log(token, req.headers["x-vercel-proxy-signature"]);
   // const token = authorization.split("Bearer ")[1];
