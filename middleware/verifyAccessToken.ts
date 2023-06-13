@@ -10,15 +10,14 @@ module.exports.verifyAccessToken = (
   console.log(`authorization=${authorization}`);
 
   const token: any = authorization.split("Bearer ")[1];
-  console.log(`token=${token}`);
+
   // console.log(token, req.headers["x-vercel-proxy-signature"]);
   // const token = authorization.split("Bearer ")[1];
   // const token = authorization.split("Bearer ")[1];
-
+  let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
   try {
-    let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(token);
     console.log(`decoded=${decoded}`);
+    console.log(decoded, req.email);
     req.email = decoded.email;
   } catch (error: any) {
     console.log(error);
