@@ -33,7 +33,6 @@ router.get(
 router.get(
   "/select",
   verifyAccessToken,
-  verifyRefreshToken,
 
   async (req: any, res: Response, next: NextFunction) => {
     const currentUser: any = await Users.findOne({
