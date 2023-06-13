@@ -7,10 +7,10 @@ module.exports.verifyAccessToken = (
   next: NextFunction
 ) => {
   const authorization = req.headers["x-vercel-proxy-signature"];
-  console.log(`authorization=${authorization}`);
 
   const token: any = authorization.split("Bearer ")[1];
-
+  let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+  console.log(decoded);
   // console.log(token, req.headers["x-vercel-proxy-signature"]);
   // const token = authorization.split("Bearer ")[1];
   // const token = authorization.split("Bearer ")[1];
@@ -19,11 +19,8 @@ module.exports.verifyAccessToken = (
     let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
     req.email = decoded.email;
   } catch (error: any) {
-    let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(1, error);
-    console.log(2, decoded, token);
-    console.log(3, req.email);
     return res.status(419).json({
+      
       data: req.headers,
       code: 419,
       message: "토큰이 만료되었습니다.",
