@@ -45,6 +45,8 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       })
       .cookie("accessToken", accessToken, {
         secure: true,
+        sameSite: "none",
+        httpOnly: true,
       })
       .status(200)
       .json({ message: "ok" });
