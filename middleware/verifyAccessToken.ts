@@ -17,6 +17,8 @@ module.exports.verifyAccessToken = (
 
   try {
     let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    console.log(token);
+    console.log(`decoded=${decoded}`);
     req.email = decoded.email;
   } catch (error: any) {
     console.log(error);
