@@ -14,10 +14,19 @@ module.exports.verifyAccessToken = (
   // const token = authorization.split("Bearer ")[1];
 
   try {
-    let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    let decoded = jwt.verify(
+      req.cookies.accessToken,
+      process.env.ACCESS_TOKEN_SECRET
+    );
     req.email = decoded.email;
   } catch (error: any) {
-    console.log(token, req.headers, `전체:${res}`, req.cookies.accessToken);
+    console.log(
+      token,
+      req.headers,
+      `전체:${res}`,
+      req.cookies.accessToken,
+      req.hedaers.cookie
+    );
     return res.status(419).json({
       data: req.headers,
       code: 419,
