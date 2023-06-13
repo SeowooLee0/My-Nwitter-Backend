@@ -6,16 +6,15 @@ module.exports.verifyAccessToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const authorization: any = req.headers.authorization;
-  console.log(req.headers);
+  const authorization: any =
+    req.headers["x-vercel-proxy-signature"].split(" ")[1];
+  console.log(authorization);
   const token = authorization.split("Bearer ")[1];
   // const token = authorization.split("Bearer ")[1];
 
   try {
     let decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(token);
     req.email = decoded.email;
-    console.log(decoded);
   } catch (error: any) {
     return res.status(419).json({
       data: req.headers,

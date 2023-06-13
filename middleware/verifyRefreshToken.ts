@@ -9,8 +9,8 @@ module.exports.verifyRefreshToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies.refreshToken;
-  console.log(token);
+  const token = req.cookie.refreshToken;
+
   let decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
   try {
