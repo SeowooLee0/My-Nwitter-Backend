@@ -1,5 +1,4 @@
 import { Sequelize } from "sequelize-typescript";
-import { config } from "../config/config";
 import { Bookmark } from "./bookmark";
 import { Comments } from "./comments";
 import { Follow } from "./follow";
@@ -9,6 +8,7 @@ import { SocketId } from "./socketId";
 import { Tweets } from "./tweets";
 import { Users } from "./user";
 import mysql2 from "mysql2";
+const config = require("../config/config");
 
 const development = new Sequelize({
   dialect: "mysql",

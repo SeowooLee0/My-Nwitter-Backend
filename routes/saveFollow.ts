@@ -23,16 +23,12 @@ router.post(
       return r.user_id;
     });
 
-    if (req.token === "login again") {
-      res.json("login again");
-    } else if (req.token === "refresh ok") {
-      await Follow.create({
-        user_id: req.body.user_id,
-        follower_id: currentUser,
-      }).then((result) => {
-        res.status(201).json(result);
-      });
-    }
+    await Follow.create({
+      user_id: req.body.user_id,
+      follower_id: currentUser,
+    }).then((result) => {
+      res.status(201).json(result);
+    });
   }
 );
 
@@ -49,18 +45,14 @@ router.post(
       return r.user_id;
     });
 
-    if (req.token === "login again") {
-      res.json("login again");
-    } else if (req.token === "refresh ok") {
-      await Follow.destroy({
-        where: {
-          user_id: req.body.user_id,
-          follower_id: currentUser,
-        },
-      }).then((result) => {
-        res.status(201).json(result);
-      });
-    }
+    await Follow.destroy({
+      where: {
+        user_id: req.body.user_id,
+        follower_id: currentUser,
+      },
+    }).then((result) => {
+      res.status(201).json(result);
+    });
   }
 );
 

@@ -6,7 +6,7 @@ module.exports.verifyAccessToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const authorization = req.headers["x-vercel-proxy-signature"];
+  const authorization = req.headers.authorization;
   const token = authorization.split("Bearer ")[1];
 
   // console.log(token, req.headers["x-vercel-proxy-signature"]);
@@ -20,13 +20,7 @@ module.exports.verifyAccessToken = (
     );
     req.email = decoded.email;
   } catch (error: any) {
-    console.log(
-      token,
-      req.headers,
-      `전체:${res}`,
-      req.cookies.accessToken,
-      req.hedaers.cookie
-    );
+  
     return res.status(419).json({
       data: req.headers,
       code: 419,

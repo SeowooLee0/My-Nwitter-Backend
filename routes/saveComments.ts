@@ -11,18 +11,14 @@ router.post(
   verifyAccessToken,
   verifyRefreshToken,
   async (req: any, res: Response, next: NextFunction) => {
-    if (req.token === "login again") {
-      res.json("login again");
-    } else if (req.token === "refresh ok") {
-      await Comments.create({
-        tweet_id: req.body.tweet_id,
-        email: req.email,
-        comment: req.body.comment,
-        write_date: sequelize.development.literal(`now()`),
-      }).then((result) => {
-        res.status(201).json(result);
-      });
-    }
+    await Comments.create({
+      tweet_id: req.body.tweet_id,
+      email: req.email,
+      comment: req.body.comment,
+      write_date: sequelize.development.literal(`now()`),
+    }).then((result) => {
+      res.status(201).json(result);
+    });
   }
 );
 

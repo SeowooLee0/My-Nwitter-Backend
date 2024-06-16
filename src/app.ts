@@ -61,32 +61,8 @@ io.on("connection", (socket: any) => {
     console.error(error);
   });
 
-  // 메세지 페이지 처음 로딩할때 체팅 데이터 가져오기
-  socket.on("REQUEST_DATA", async (data: any) => {
-    const findData = await redisCli.KEYS(`roomId:*${data.id}*`);
-    let respondData: any = [];
-    await Promise.all(
-      findData.map(async (t: any) => {
-        let roomId = await redisCli.GET(`${t}`);
-        let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
-
-        if (chatData[0] === undefined) {
-          return redisCli.DEL(t);
-        } else {
-          const change = JSON.parse(chatData);
-          return respondData.push(change);
-        }
-      })
-    );
-
-    io.to(socket.id).emit("RESPOND_DATA", respondData);
-    // let roomId = await redisCli.MGET(...keys);
-  });
-
   // 로그인했을때 소켓아이디 현재 접속자 데이터에 넣게
   socket.on("login", async (data: any) => {
-    // 'client' room에 넣는다.
-
     await socket.join("client");
 
     await Users.findOne({
@@ -95,6 +71,7 @@ io.on("connection", (socket: any) => {
       },
     }).then(async (r: any) => {
       const checkKey = await redisCli.EXISTS(`${r.user_id}`);
+
       if (checkKey) {
         await redisCli.GET(`$(r.user_id)`).then(() => {
           redisCli.DEL(`${r.user_id}`);
@@ -105,110 +82,203 @@ io.on("connection", (socket: any) => {
       await redisCli.SADD("currentUser", `${socket.id}`);
 
       const checkCurrent = await redisCli.SMEMBERS("currentUser");
-
-      // console.log(socket.id, checkCurrent, checkKey);
     });
 
     // Redis에 userID와 socketID를 저장한다.
   });
 
-  socket.on("START_CHAT", async (data: any) => {
-    const chatExist = await redisCli.EXISTS(`roomId:${data.users}`);
+  // 메세지 페이지 처음 로딩할때 체팅 데이터 가져오기
+  socket.on("REQUEST_DATA", async (data: any) => {
+    const findData = await redisCli.KEYS(`chat-*${data.id}*`);
 
-    if (chatExist == 1) {
-      let roomId = await redisCli.GET(`roomId:${data.users}`);
-
-      const allData = await redisCli.ZRANGE(`${roomId}`, 0, -1);
-
-      if (allData === !null) console.log("발송");
-      io.to(socket.id).emit("BEFORE_DATA", allData);
-    } else {
-      await redisCli.SET(`roomId:${data.users}`, `${data.roomId}`);
-    }
-  });
-
-  socket.on("SEND_MESSAGE", async (m: any) => {
-    const receiveUser = await redisCli.GET(`${m.receiveUser}`);
-    // const currentUser = await redisCli.get(`${m.id}`);
-    const checkUserExist = await redisCli.SISMEMBER(
-      "currentUser",
-      `${receiveUser}`
-    );
-
-    let messageData = {
-      send: `${m.id}`,
-      receive: `${m.receiveUser}`,
-      message: `${m.message}`,
-      date: `${m.time}`,
-    };
-
-    let change = JSON.stringify(messageData);
-
-    let score = Number(m.score);
-    const nowDate = new Date();
-
-    const findData = await redisCli.KEYS(`roomId:*${m.id}*`);
     let respondData: any = [];
     await Promise.all(
       findData.map(async (t: any) => {
-        let roomId = await redisCli.GET(`${t}`);
-        let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
+        let chatData = await redisCli.ZRANGE(`${t}`, 0, -1);
 
         if (chatData[0] === undefined) {
           return redisCli.DEL(t);
         } else {
-          const change = JSON.parse(chatData);
-          return respondData.push(change);
+          chatData.forEach((item: any) => {
+            const parsedItem = JSON.parse(item);
+            return respondData.push(parsedItem);
+          });
         }
       })
     );
 
     io.to(socket.id).emit("RESPOND_DATA", respondData);
+    // let roomId = await redisCli.MGET(...keys);
+  });
 
-    if (checkUserExist === 1) {
-      let id = m.id;
-      let message = m.message;
-      let date = m.time;
-      let roomId = await redisCli.GET(`roomId:${m.sortId}`);
-      redisCli.ZADD(`${roomId}`, { score: score, value: change });
-      const data = await redisCli.ZRANGE(`{roomId}`, 0, -1);
+  // socket.on("REQUEST_DATA", async (data: any) => {
+  //   const findData = await redisCli.KEYS(`roomId:*${data.id}*`);
+  //   const allData = await redisCli.KEYS("`**${data.id}**`");
+  //   console.log(allData, data.id);
+  //   // 사용자의 채팅방 목록을 가져오는 함수
+  //   console.log(`findData === ${findData}`);
+  //   const chatRoomsData = await Promise.all(
+  //     //     })
+  //     findData.map(async (t: any) => {
+  //       let roomId = await redisCli.GET(`${t}`);
 
-      // redis에 채팅 데이터 저장하기
+  //       const messages = await redisCli.ZRANGE(`${roomId}`, 0, -1);
+  //       console.log(`roomId === {roodId} messages ==${messages}`);
+  //       if (messages[0] === undefined) {
+  //         return redisCli.DEL(t);
+  //       } else {
+  //         return { roomId, messages: messages.map(JSON.parse) };
+  //       }
+  //     })
+  //   );
 
-      io.to(receiveUser).emit("RECEIVE_MESSAGE", {
-        id,
-        message,
-        date,
-        data,
-      });
-      if (m.id !== m.receiveUser) {
-        const findData = await redisCli.KEYS(`roomId:*${m.receiveUser}*`);
-        let respondData: any = [];
-        await Promise.all(
-          findData.map(async (t: any) => {
-            let roomId = await redisCli.GET(`${t}`);
-            let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
+  //   socket.emit("RESPOND_DATA", chatRoomsData);
+  // });
 
-            if (chatData[0] === undefined) {
-              return redisCli.DEL(t);
-            } else {
-              const change = JSON.parse(chatData);
-              return respondData.push(change);
-            }
-          })
-        );
+  socket.on("START_CHAT", async (data: any) => {
+    const roomId = `chat-${data.users.sort().join("-")}`;
+
+    // Redis에서 해당 roomId의 존재 여부를 확인
+    const chatExist = await redisCli.EXISTS(roomId);
+
+    if (chatExist) {
+      // 채팅방이 이미 존재하는 경우, 해당 채팅방의 메시지 데이터 불러오기
+      const allData = await redisCli.ZRANGE(roomId, 0, -1);
+      if (allData.length > 0) {
+        io.to(socket.id).emit("BEFORE_DATA", roomId);
       }
-
-      io.to(socket.id).emit("RESPOND_DATA", respondData);
-
-      // console.log("전송");
     } else {
-      let roomId = await redisCli.GET(`roomId:${m.sortId}`);
-      await redisCli.ZADD(`${roomId}`, {
-        score: score,
-        value: change,
-      });
+      // 채팅방이 존재하지 않는 경우, 새로운 채팅방 정보를 Redis에 저장
+      console.log("Creating new chat room:", roomId);
+      await redisCli.SET(`roomId:${roomId}`, JSON.stringify(data.users));
     }
+  });
+  // 메세지 페이지 처음 로딩할때 체팅 데이터 가져오기
+  // socket.on("REQUEST_DATA", async (data: any) => {
+  //   const findData = await redisCli.KEYS(`roomId:*${data.id}*`);
+
+  //   let respondData: any = [];
+  //   await Promise.all(
+  //     findData.map(async (t: any) => {
+  //       let roomId = await redisCli.GET(`${t}`);
+
+  //       let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
+
+  //       if (chatData[0] === undefined) {
+  //         return redisCli.DEL(t);
+  //       } else {
+  //         chatData.forEach((item: any) => {
+  //           const parsedItem = JSON.parse(item);
+  //           return respondData.push(parsedItem);
+  //         });
+  //       }
+  //     })
+  //   );
+
+  //   let allChatData: any[] = [];
+  //   await Promise.all(
+  //     findData.map(async (t: any) => {
+  //       let roomId = await redisCli.GET(`${t}`);
+  //       console.log(`올챗roomId ====${roomId}`);
+  //       let chatData = await redisCli.ZRANGE(`${roomId}`, 0, -1);
+  //       chatData.roomId = `${roomId}`;
+
+  //       if (chatData.length > 0) {
+  //         allChatData.push(chatData);
+  //       } else {
+  //         await redisCli.DEL(t);
+  //       }
+  //     })
+  //   );
+
+  //   interface Message {
+  //     send: string;
+  //     receive: string;
+  //     message: string;
+  //     date: string;
+  //   }
+
+  //   // 채팅방 객체에 대한 TypeScript 인터페이스 정의
+  //   interface ChatRooms {
+  //     [key: string]: Message[];
+  //   }
+
+  //   const groupChatDataByRoom = (chatDataArray: string[][]): ChatRooms => {
+  //     const rooms: ChatRooms = {};
+
+  //     chatDataArray.forEach((chatData) => {
+  //       chatData.forEach((item) => {
+  //         const message: Message = JSON.parse(item);
+  //         const roomKey: string = `[${message.send}, ${message.receive}]`;
+
+  //         if (!rooms[roomKey]) {
+  //           rooms[roomKey] = [];
+  //         }
+  //         rooms[roomKey].push(message);
+  //       });
+  //     });
+
+  //     return rooms;
+  //   };
+
+  //   const groupedChatData = groupChatDataByRoom(allChatData);
+  //   console.log(`groupedChatData ==== ${groupedChatData}`);
+  //   io.to(socket.id).emit("RESPOND_DATA", groupedChatData);
+  //   // let roomId = await redisCli.MGET(...keys);
+  // });
+
+  // socket.on("START_CHAT", async (data: any) => {
+  //   const chatExist = await redisCli.EXISTS(`roomId:${data.users}`);
+  //   console.log("roomId는", data.users);
+
+  //   if (chatExist == 1) {
+  //     let roomId = await redisCli.GET(`roomId:${data.users}`);
+  //     console.log(roomId);
+  //     const allData = await redisCli.ZRANGE(`${roomId}`, 0, -1);
+
+  //     if (allData === !null) {
+  //       console.log("발송");
+  //       io.to(socket.id).emit("BEFORE_DATA", allData);
+  //     }
+  //   } else {
+  //     console.log("채팅방 시작");
+  //     await redisCli.SET(`roomId:${data.users}`, `${data.roomId}`);
+  //   }
+  // });
+
+  socket.on("SEND_MESSAGE", async (m: any) => {
+    console.log(`채팅 도착 ${m.message}`);
+
+    let messageData = {
+      send: `${m.send}`,
+      receive: `${m.receive}`,
+      message: `${m.message}`,
+      date: `${m.date}`,
+      roomId: `${m.roomId}`,
+    };
+
+    let change = JSON.stringify(messageData);
+
+    let score = Number(m.score);
+    await redisCli.ZADD(`${m.roomId}`, { score: score, value: change });
+
+    // 메시지를 받는 사람에게 실시간으로 메시지 전송
+
+    // 메시지를 받는 사람의 소켓 ID를 Redis에서 조회
+    let getSocketId = await redisCli.GET(`${m.receive}`);
+
+    // 조회한 소켓 ID로 메시지 전송
+    if (getSocketId) {
+      io.to(getSocketId).emit("RECEIVE_MESSAGE", change);
+    } else {
+      console.log("소켓 ID를 찾을 수 없습니다.");
+    }
+
+    // 선택된 roomId에 저장된 최신 메시지를 받아서 응답
+    let chatData = await redisCli.ZRANGE(`${m.roomId}`, -1, -1);
+    const latestMessage = JSON.parse(chatData[0]);
+    console.log(m.receive);
+    io.to(getSocketId).emit("RESPOND_DATA", latestMessage);
   });
 
   socket.on("SEND_COMMENT", async (data: any) => {

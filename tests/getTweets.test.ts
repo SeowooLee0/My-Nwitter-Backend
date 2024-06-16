@@ -1,8 +1,6 @@
 const request = require("supertest");
 const app = require("../src/app");
 
-const { sequelize } = require("../models");
-
 // beforeAll(async () => {
 //   await sequelize.test.sync();
 // });

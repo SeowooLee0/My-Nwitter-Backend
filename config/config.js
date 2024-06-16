@@ -1,5 +1,13 @@
-const dotenv = require("dotenv");
-dotenv.config();
+"use strict";
+var __importDefault =
+  (this && this.__importDefault) ||
+  function (mod) {
+    return mod && mod.__esModule ? mod : { default: mod };
+  };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.config = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 
 module.exports = {
   development: {
@@ -9,9 +17,9 @@ module.exports = {
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     dialect: "mysql",
-    timezone: "+09:00", // 한국 timezone 설정
+    timezone: "+09:00",
     dialectOptions: {
-      dateStrings: true, // 가져올 때 string으로 가져오기
+      dateStrings: true,
       typeCast: true,
     },
   },

@@ -17,7 +17,7 @@ router.get(
       where: { email: req.email },
     });
     let currentUser = userData?.user_id;
-    console.log(res.req.query);
+    // console.log(res.req.query);
     //리트윗한 데이터
     let retweets: any = [];
     //좋아요 누른 데이터
@@ -36,45 +36,50 @@ router.get(
           let isBookmark = false;
           let retweet_data: any = [];
           if (d.reply_tweet_id !== null) {
-            const t: any = await Tweets.findOne({
-              include: [Likes, Bookmark, Comments, Users],
-              where: { tweet_id: d.reply_tweet_id },
-            });
-            let RLike = false;
-            let RBookmark = false;
-            if (
-              t.like.some((i: any) => {
-                return i.user_id === currentUser;
-              })
-            ) {
-              RLike = true;
-            }
-            if (
-              t.bookmark.some((i: any) => {
-                return i.user_id === currentUser;
-              })
-            ) {
-              RBookmark = true;
-            }
-            let data = {
-              tweet_id: t.tweet_id,
-              profile: t.user.profile,
-              content: t.content,
-              email: t.email,
-              like: t.like,
-              tag: t.tag,
-              user_id: t.user_id,
-              write_date: t.write_date,
-              upload_file: t.upload_file,
-              reply_tweet_id: t.reply_tweet_id,
-              is_like: RLike,
-              is_bookmark: RBookmark,
-              comment: [],
-              is_opened: false,
-              retweet_opened: false,
-            };
+            const tweetExists = await Tweets.findByPk(d.reply_tweet_id);
+            if (tweetExists) {
+              await Tweets.findOne({
+                include: [Likes, Bookmark, Users],
+                where: { tweet_id: d.reply_tweet_id },
+              }).then((t: any) => {
+                let RLike = false;
+                let RBookmark = false;
+                if (
+                  t.like.some((i: any) => {
+                    return i.user_id === currentUser;
+                  })
+                ) {
+                  RLike = true;
+                }
+                if (
+                  t.bookmark.some((i: any) => {
+                    return i.user_id === currentUser;
+                  })
+                ) {
+                  RBookmark = true;
+                }
 
-            retweet_data.push(data);
+                let data = {
+                  tweet_id: t.tweet_id,
+                  profile: t.user.profile,
+                  content: t.content,
+                  email: t.email,
+                  like: t.like,
+                  tag: t.tag,
+                  user_id: t.user_id,
+                  write_date: t.write_date,
+                  upload_file: t.upload_file,
+                  reply_tweet_id: t.reply_tweet_id,
+                  is_like: RLike,
+                  is_bookmark: RBookmark,
+                  comment: [],
+                  is_opened: false,
+                  retweet_opened: false,
+                };
+
+                retweet_data.push(data);
+              });
+            }
           }
           if (
             d.like.some((i: any) => {

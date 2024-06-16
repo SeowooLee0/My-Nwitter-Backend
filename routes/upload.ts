@@ -73,7 +73,6 @@ router.post("/", (req: any, res: any) => {
         image: res.req.file.path,
         fileName: res.req.file.filename,
       });
-      console.log(res.req.file);
     });
   });
 });
