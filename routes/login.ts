@@ -39,9 +39,13 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 
     res
       .cookie("refreshToken", refreshToken, {
-        httpOnly: true,
+        sameSite: "none", // CORS에서 다른 도메인 간 쿠키를 허용하기 위해 "none" 사용
+        httpOnly: true, // 클라이언트 측에서 접근하지 못하도록 설정 (보안 강화)
       })
-      .cookie("accessToken", accessToken, {})
+      .cookie("accessToken", accessToken, {
+        sameSite: "none", // 다른 도메인 간 쿠키 허용
+        httpOnly: false, // accessToken은 클라이언트에서 접근 가능
+      })
       .status(200)
       .json({ message: "ok", data: res.cookie });
   } catch (err: any) {
