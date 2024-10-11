@@ -10,11 +10,11 @@ module.exports.verifyRefreshToken = (
   next: NextFunction
 ) => {
   const token = req.cookies.refreshToken;
+  console.log("Cookies:", req.cookies);
+
   if (!token) {
     return res.status(401).json({ message: "토큰이 제공되지 않았습니다." });
   }
-
-  console.log("Cookies:", req.cookies);
 
   let decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 

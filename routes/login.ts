@@ -37,6 +37,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     let accessToken = generateAccessToken(email);
     let refreshToken = generateRefreshToken(email);
 
+    console.log(accessToken, refreshToken);
     res
       .cookie("refreshToken", refreshToken, {
         sameSite: "none", // CORS에서 다른 도메인 간 쿠키를 허용하기 위해 "none" 사용
