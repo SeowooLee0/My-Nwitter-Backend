@@ -39,14 +39,14 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 
     res
       .cookie("refreshToken", refreshToken, {
-        httpOnly: false,
-        sameSite: "lax", // 기본적인 보안 옵션, 크로스 사이트 쿠키 허용하지 않음
-        secure: false,
+        httpOnly: true, // 자바스크립트에서 접근 불가
+        sameSite: "none", // 크로스 사이트 허용
+        secure: true,
       })
       .cookie("accessToken", accessToken, {
-        httpOnly: false,
-        sameSite: "lax", // 기본적인 보안 옵션, 크로스 사이트 쿠키 허용하지 않음
-        secure: false,
+        httpOnly: true, // 자바스크립트에서 접근 불가
+        sameSite: "none", // 크로스 사이트 허용
+        secure: true,
       })
       .status(200)
       .json({ message: "ok", data: res.cookie });
