@@ -38,16 +38,8 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     let refreshToken = generateRefreshToken(email);
 
     res
-      .cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        sameSite: "none", // CORS 허용 시 필요
-        secure: false, // HTTPS 환경에서만 true, HTTP 환경에서는 false
-      })
-      .cookie("accessToken", accessToken, {
-        httpOnly: false,
-        sameSite: "none",
-        secure: false,
-      })
+      .cookie("refreshToken", refreshToken)
+      .cookie("accessToken", accessToken)
       .status(200)
       .json({ message: "ok", data: res.cookie });
     console.log(res.cookie);
