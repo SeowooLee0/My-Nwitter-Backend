@@ -9,12 +9,12 @@ module.exports.verifyRefreshToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookies.refreshToken;
+  const token = req.cookie.refreshToken;
 
   if (!token) {
     return res
       .status(403)
-      .json({ message: "리프레시 토큰이 없습니다.", data: req.cookie });
+      .json({ message: "리프레시 토큰이 없습니다.", data: req });
   }
   let decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
