@@ -10,7 +10,7 @@ module.exports.verifyRefreshToken = (
   next: NextFunction
 ) => {
   const token = req.cookies.refreshToken;
-  console.log(req);
+  console.log(req.cookies);
   if (!token) {
     return res
       .status(403)
