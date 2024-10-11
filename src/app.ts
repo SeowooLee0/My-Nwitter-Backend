@@ -19,9 +19,6 @@ interface data {
   tweetId: Number;
 }
 
-const cookieParser = require("cookie-parser");
-app.use(cookieParser());
-
 app.use(
   cors({
     origin: ["http://localhost:8080", "https://my-nwitter.vercel.app"],
