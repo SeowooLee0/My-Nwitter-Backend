@@ -8,9 +8,6 @@ import cors from "cors";
 import path from "path";
 import { Users } from "../models/user";
 import { SocketId } from "../models/socketId";
-import e from "express";
-import { tsConstructSignatureDeclaration } from "@babel/types";
-const { verifyAccessToken } = require("../middleware/verifyAccessToken");
 const { Op } = require("sequelize");
 
 const app = express();
