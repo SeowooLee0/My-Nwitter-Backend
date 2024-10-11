@@ -9,14 +9,14 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
   const generateAccessToken = (email: any) => {
     return jwt.sign({ email }, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "30m",
+      expiresIn: "1h",
     });
   };
 
   // refersh token을 secret key  기반으로 생성
   const generateRefreshToken = (email: any) => {
     return jwt.sign({ email }, process.env.REFRESH_TOKEN_SECRET, {
-      expiresIn: "100m",
+      expiresIn: "3h",
     });
   };
 
