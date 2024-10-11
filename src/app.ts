@@ -26,7 +26,6 @@ app.use(
   cors({
     origin: ["http://localhost:8080", "https://my-nwitter.vercel.app"],
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
