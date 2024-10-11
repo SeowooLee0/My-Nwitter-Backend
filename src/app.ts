@@ -1,6 +1,5 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response } from "express";
 import sequelize from "../models/index";
-
 import { Tweets } from "../models/tweets";
 import bodyParser from "body-parser";
 import cookiePaser from "cookie-parser";
