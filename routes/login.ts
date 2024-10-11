@@ -37,7 +37,6 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     let accessToken = generateAccessToken(email);
     let refreshToken = generateRefreshToken(email);
 
-    console.log(accessToken, refreshToken);
     res
       .cookie("refreshToken", refreshToken, {
         sameSite: "none", // CORS에서 다른 도메인 간 쿠키를 허용하기 위해 "none" 사용
@@ -49,6 +48,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
       })
       .status(200)
       .json({ message: "ok", data: res.cookie });
+    console.log(res.cookie);
   } catch (err: any) {
     return res.status(400).send({ err: err.message });
   }
