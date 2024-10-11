@@ -8,13 +8,11 @@ import cors from "cors";
 import { Users } from "../models/user";
 import { SocketId } from "../models/socketId";
 const { Op } = require("sequelize");
-
 const app = express();
 const server = require("http").createServer(app);
 const port = 1234;
 const SocketIO = require("socket.io");
 const io = SocketIO(server, { cors: { origin: "*" } });
-const router = express.Router();
 const redis = require("redis");
 
 interface data {
