@@ -9,8 +9,8 @@ module.exports.verifyRefreshToken = (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.cookie.refreshToken;
-
+  const token = req.cookies.refreshToken;
+  console.log(req);
   if (!token) {
     return res
       .status(403)
