@@ -39,12 +39,10 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 
     res
       .cookie("refreshToken", refreshToken, {
-        secure: true,
         sameSite: "none",
         httpOnly: true,
       })
       .cookie("accessToken", accessToken, {
-        secure: true,
         sameSite: "none",
       })
       .status(200)
