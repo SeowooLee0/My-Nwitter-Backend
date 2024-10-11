@@ -108,32 +108,7 @@ io.on("connection", (socket: any) => {
     );
 
     io.to(socket.id).emit("RESPOND_DATA", respondData);
-    // let roomId = await redisCli.MGET(...keys);
   });
-
-  // socket.on("REQUEST_DATA", async (data: any) => {
-  //   const findData = await redisCli.KEYS(`roomId:*${data.id}*`);
-  //   const allData = await redisCli.KEYS("`**${data.id}**`");
-  //   console.log(allData, data.id);
-  //   // 사용자의 채팅방 목록을 가져오는 함수
-  //   console.log(`findData === ${findData}`);
-  //   const chatRoomsData = await Promise.all(
-  //     //     })
-  //     findData.map(async (t: any) => {
-  //       let roomId = await redisCli.GET(`${t}`);
-
-  //       const messages = await redisCli.ZRANGE(`${roomId}`, 0, -1);
-  //       console.log(`roomId === {roodId} messages ==${messages}`);
-  //       if (messages[0] === undefined) {
-  //         return redisCli.DEL(t);
-  //       } else {
-  //         return { roomId, messages: messages.map(JSON.parse) };
-  //       }
-  //     })
-  //   );
-
-  //   socket.emit("RESPOND_DATA", chatRoomsData);
-  // });
 
   socket.on("START_CHAT", async (data: any) => {
     const roomId = `chat-${data.users.sort().join("-")}`;
@@ -153,98 +128,6 @@ io.on("connection", (socket: any) => {
       await redisCli.SET(`roomId:${roomId}`, JSON.stringify(data.users));
     }
   });
-  // 메세지 페이지 처음 로딩할때 체팅 데이터 가져오기
-  // socket.on("REQUEST_DATA", async (data: any) => {
-  //   const findData = await redisCli.KEYS(`roomId:*${data.id}*`);
-
-  //   let respondData: any = [];
-  //   await Promise.all(
-  //     findData.map(async (t: any) => {
-  //       let roomId = await redisCli.GET(`${t}`);
-
-  //       let chatData = await redisCli.ZRANGE(`${roomId}`, -1, -1);
-
-  //       if (chatData[0] === undefined) {
-  //         return redisCli.DEL(t);
-  //       } else {
-  //         chatData.forEach((item: any) => {
-  //           const parsedItem = JSON.parse(item);
-  //           return respondData.push(parsedItem);
-  //         });
-  //       }
-  //     })
-  //   );
-
-  //   let allChatData: any[] = [];
-  //   await Promise.all(
-  //     findData.map(async (t: any) => {
-  //       let roomId = await redisCli.GET(`${t}`);
-  //       console.log(`올챗roomId ====${roomId}`);
-  //       let chatData = await redisCli.ZRANGE(`${roomId}`, 0, -1);
-  //       chatData.roomId = `${roomId}`;
-
-  //       if (chatData.length > 0) {
-  //         allChatData.push(chatData);
-  //       } else {
-  //         await redisCli.DEL(t);
-  //       }
-  //     })
-  //   );
-
-  //   interface Message {
-  //     send: string;
-  //     receive: string;
-  //     message: string;
-  //     date: string;
-  //   }
-
-  //   // 채팅방 객체에 대한 TypeScript 인터페이스 정의
-  //   interface ChatRooms {
-  //     [key: string]: Message[];
-  //   }
-
-  //   const groupChatDataByRoom = (chatDataArray: string[][]): ChatRooms => {
-  //     const rooms: ChatRooms = {};
-
-  //     chatDataArray.forEach((chatData) => {
-  //       chatData.forEach((item) => {
-  //         const message: Message = JSON.parse(item);
-  //         const roomKey: string = `[${message.send}, ${message.receive}]`;
-
-  //         if (!rooms[roomKey]) {
-  //           rooms[roomKey] = [];
-  //         }
-  //         rooms[roomKey].push(message);
-  //       });
-  //     });
-
-  //     return rooms;
-  //   };
-
-  //   const groupedChatData = groupChatDataByRoom(allChatData);
-  //   console.log(`groupedChatData ==== ${groupedChatData}`);
-  //   io.to(socket.id).emit("RESPOND_DATA", groupedChatData);
-  //   // let roomId = await redisCli.MGET(...keys);
-  // });
-
-  // socket.on("START_CHAT", async (data: any) => {
-  //   const chatExist = await redisCli.EXISTS(`roomId:${data.users}`);
-  //   console.log("roomId는", data.users);
-
-  //   if (chatExist == 1) {
-  //     let roomId = await redisCli.GET(`roomId:${data.users}`);
-  //     console.log(roomId);
-  //     const allData = await redisCli.ZRANGE(`${roomId}`, 0, -1);
-
-  //     if (allData === !null) {
-  //       console.log("발송");
-  //       io.to(socket.id).emit("BEFORE_DATA", allData);
-  //     }
-  //   } else {
-  //     console.log("채팅방 시작");
-  //     await redisCli.SET(`roomId:${data.users}`, `${data.roomId}`);
-  //   }
-  // });
 
   socket.on("SEND_MESSAGE", async (m: any) => {
     console.log(`채팅 도착 ${m.message}`);
@@ -401,12 +284,5 @@ server.listen(port, async () => {
       console.log("error: ", e);
     });
 });
-
-// app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-//   res.locals.message = err.message;
-//   res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
-//   res.status(err.status || 500);
-//   res.render("error");
-// });
 
 module.exports = app;
