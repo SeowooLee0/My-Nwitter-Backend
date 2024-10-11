@@ -38,8 +38,16 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
     let refreshToken = generateRefreshToken(email);
 
     res
-      .cookie("refreshToken", refreshToken)
-      .cookie("accessToken", accessToken)
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: false,
+        sameSite: "lax", // 기본적인 보안 옵션, 크로스 사이트 쿠키 허용하지 않음
+        secure: false,
+      })
+      .cookie("accessToken", accessToken, {
+        httpOnly: false,
+        sameSite: "lax", // 기본적인 보안 옵션, 크로스 사이트 쿠키 허용하지 않음
+        secure: false,
+      })
       .status(200)
       .json({ message: "ok", data: res.cookie });
     console.log(res.cookie);
