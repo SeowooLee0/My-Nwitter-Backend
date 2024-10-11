@@ -5,7 +5,6 @@ import { Tweets } from "../models/tweets";
 import bodyParser from "body-parser";
 import cookiePaser from "cookie-parser";
 import cors from "cors";
-import path from "path";
 import { Users } from "../models/user";
 import { SocketId } from "../models/socketId";
 const { Op } = require("sequelize");
