@@ -14,7 +14,7 @@ module.exports.verifyRefreshToken = (
   if (!token) {
     return res
       .status(403)
-      .json({ message: "리프레시 토큰이 없습니다.", data: req.cookies });
+      .json({ message: "리프레시 토큰이 없습니다.", data: req.cookie });
   }
   let decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
 
