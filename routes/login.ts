@@ -39,9 +39,9 @@ router.post("/", async (req: Request, res: Response, next: NextFunction) => {
 
     res
       .cookie("refreshToken", refreshToken, {
-        httpOnly: true, // 자바스크립트에서 접근 불가
-        sameSite: "none", // 크로스 사이트 허용
-        secure: true,
+        httpOnly: true,
+        secure: true, // HTTPS에서만 전송
+        sameSite: "none",
       })
       .cookie("accessToken", accessToken, {
         httpOnly: true, // 자바스크립트에서 접근 불가
