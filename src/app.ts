@@ -19,14 +19,17 @@ interface data {
   tweetId: Number;
 }
 
-app.use(
-  cors({
-    origin: ["http://localhost:8080", "https://my-nwitter.vercel.app"],
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: ["http://localhost:8080", "https://my-nwitter.vercel.app"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // 허용할 메서드
+  allowedHeaders: ["Authorization", "Content-Type"], // 허용할 헤더
+};
 
-app.options("*", cors());
+app.use(cors(corsOptions));
+
+// 명시적으로 프리플라이트 OPTIONS 요청 처리
+app.options("*", cors(corsOptions));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
