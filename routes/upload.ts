@@ -60,6 +60,7 @@ const tweetsUpload = multer({
     },
   }),
 });
+
 const uploadTweets = tweetsUpload.fields([
   { name: "upload_file", maxCount: 1 }, // 이미지 파일 필드 (파일 1개 허용)
   { name: "id" }, // 사용자 ID 필드
@@ -70,6 +71,7 @@ const uploadTweets = tweetsUpload.fields([
 // 프로필 이미지 업로드 라우터
 router.post("/", (req: any, res: any) => {
   upload(req, res, async (err: any) => {
+    console.log("여기 실행중임. '/'");
     if (err) {
       console.log(err);
       return res.json({ success: false, err });
@@ -118,16 +120,13 @@ export const uploadImage = async (req: Request, res: Response) => {
   }
 };
 
-// 트윗 업로드 라우터
 router.post(
   "/tweets",
   upload.single("profile_img"),
   async (req: Request, res: Response) => {
     try {
       console.log("트윗 업로드 라우터 호출됨");
-
-      // 파일 정보는 req.file에 저장됨
-      console.log(req.file);
+      console.log(req.file); // 파일 정보 확인
 
       res.status(200).json({ message: "파일 업로드 성공", file: req.file });
     } catch (error) {
