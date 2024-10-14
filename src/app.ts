@@ -90,11 +90,8 @@ app.use("/refreshTokenRequest", refreshTokenRequest);
 const logout = require("../routes/logout");
 app.use("/logout", logout);
 
-const profileUploadRouter = require("../routes/upload"); // 프로필 업로드 전용 라우터
-const tweetsUploadRouter = require("../route"); // 트윗 업로드 전용 라우터
-
-app.use("/upload", profileUploadRouter); // 프로필 업로드
-app.use("/upload/tweets", tweetsUploadRouter);
+const upload = require("../routes/upload");
+app.use("/upload", upload);
 
 const saveFollow = require("../routes/saveFollow");
 app.use("/saveFollow", saveFollow);
