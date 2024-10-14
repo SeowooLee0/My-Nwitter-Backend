@@ -19,7 +19,7 @@ const path = require("path");
 
 const router = express.Router();
 
-const s3Client = new S3Client([
+const s3 = new S3Client([
   {
     region: process.env.AWS_REGION,
     credentials: {
@@ -31,27 +31,20 @@ const s3Client = new S3Client([
 
 const bucket = process.env.AWS_S3_BUCKET_NAME as string;
 
-const profileUpload = multer({
+const upload = multer({
   storage: multerS3({
-    s3: s3Client,
-    bucket: bucket, // Your S3 bucket name
-    acl: "public-read", // Make files publicly accessible if needed
-    metadata: (req, file, cb) => {
-      cb(null, { fieldName: file.fieldname });
-    },
-    contentType: multerS3.AUTO_CONTENT_TYPE,
+    s3: s3,
+    bucket: bucket, // S3 버킷 이름
     key: (req, file, cb) => {
-      cb(
-        null,
-        `profile_images/${Date.now()}_${path.basename(file.originalname)}`
-      ); // Save files under 'profile_images' folder in S3
+      cb(null, `uploads/${Date.now().toString()}_${file.originalname}`); // 파일 이름 설정
     },
+    acl: "public-read", // 파일 접근 권한 설정
   }),
 });
 
 const tweetsUpload = multer({
   storage: multerS3({
-    s3: s3Client,
+    s3: s3,
     bucket: bucket, // S3 버킷 이름
     acl: "public-read", // 파일을 공개적으로 접근 가능하도록 설정
     metadata: (req, file, cb) => {
@@ -73,7 +66,7 @@ const uploadTweets = tweetsUpload.fields([
   { name: "tweet" }, // 트윗 내용 필드
   { name: "tag" }, // 태그 필드
 ]);
-const upload = profileUpload.single("profile_img");
+
 // 프로필 이미지 업로드 라우터
 router.post("/", (req: any, res: any) => {
   upload(req, res, async (err: any) => {
@@ -126,69 +119,22 @@ export const uploadImage = async (req: Request, res: Response) => {
 };
 
 // 트윗 업로드 라우터
-router.post("/tweets", upload, async (req: Request, res: Response) => {
-  console.log("트윗 업로드 라우터 호출됨");
-  uploadImage;
+router.post(
+  "/tweets",
+  upload.single("profile_img"),
+  async (req: Request, res: Response) => {
+    try {
+      console.log("트윗 업로드 라우터 호출됨");
 
-  // uploadTweets(req, res, async (err: any) => {
-  //   if (err) {
-  //     console.log(err);
-  //     return res.status(500).json({ success: false, err });
-  //   }
+      // 파일 정보는 req.file에 저장됨
+      console.log(req.file);
 
-  //   // 파일 업로드 검증
-  //   if (
-  //     !req.files ||
-  //     !req.files.upload_file ||
-  //     req.files.upload_file.length === 0
-  //   ) {
-  //     return res
-  //       .status(400)
-  //       .json({ success: false, message: "No file uploaded" });
-  //   }
+      res.status(200).json({ message: "파일 업로드 성공", file: req.file });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "파일 업로드 실패", error });
+    }
+  }
+);
 
-  //   console.log("파일 업로드 중...");
-
-  //   try {
-  //     // 사용자 ID로 사용자 찾기
-  //     const user = await Users.findOne({
-  //       where: { user_id: req.body.id },
-  //     });
-
-  //     if (!user) {
-  //       return res
-  //         .status(404)
-  //         .json({ success: false, message: "User not found" });
-  //     }
-
-  //     // 트윗 데이터베이스에 저장
-  //     const tweet = await Tweets.create({
-  //       user_id: user.user_id,
-  //       email: user.email,
-  //       content: req.body.tweet, // 트윗 내용
-  //       tag: [req.body.tag], // 트윗 태그 (배열로 저장)
-  //       upload_file: req.files.upload_file[0].key, // S3에 저장된 파일 경로
-  //       write_date: sequelize.development.literal(`now()`), // 트윗 작성 날짜
-  //     });
-
-  //     // 트윗에 대한 좋아요 초기화
-  //     await Likes.create({
-  //       tweet_id: tweet.tweet_id,
-  //     });
-
-  //     console.log("트윗 업로드 완료");
-
-  //     // 성공적으로 저장된 파일 URL과 함께 응답
-  //     res.status(200).json({
-  //       success: true,
-  //       message: "Tweet uploaded successfully",
-  //       fileUrl: req.files.upload_file[0].location, // S3에 저장된 파일의 URL
-  //       tweet,
-  //     });
-  //   } catch (err) {
-  //     console.log("트윗 업로드 실패:", err);
-  //     res.status(500).json({ success: false, err });
-  //   }
-  // });
-});
 module.exports = router;
