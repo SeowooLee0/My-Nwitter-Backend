@@ -3,6 +3,7 @@ import sequelize from "../models/index";
 import { Tweets } from "../models/tweets";
 import bodyParser from "body-parser";
 import cookiePaser from "cookie-parser";
+
 import cors from "cors";
 import { Users } from "../models/user";
 import { SocketId } from "../models/socketId";

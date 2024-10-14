@@ -3,7 +3,10 @@ import { Likes } from "../models/like";
 import { Tweets } from "../models/tweets";
 import { Users } from "../models/user";
 import sequelize from "../models/index";
+import multerS3 from "multer-s3";
+import aws from "aws-sdk";
 const fs = require("fs");
+require("dotenv").config();
 
 const multer = require("multer");
 
@@ -14,37 +17,38 @@ const path = require("path");
 
 const router = express.Router();
 
-fs.readdir("src/public/uploads", (error: any) => {
-  // uploads 폴더 없으면 생성
-  if (error) {
-    fs.readdir("public", (error: any) => {
-      if (error) {
-        fs.mkdirSync("public/");
-      }
-      fs.mkdirSync("public/uploads");
-    });
-  }
+aws.config.update({
+  region: process.env.AWS_REGION,
 });
+const s3 = new aws.S3() as any;
+const bucket = process.env.AWS_S3_BUCKET_NAME as string;
 
-const profileStorage = multer.diskStorage({
-  destination: (req: any, file: any, cb: any) => {
-    cb(null, "src/public/uploads/");
+const profileStorage = multerS3({
+  s3: s3,
+  bucket: bucket, // Your S3 bucket name
+  acl: "public-read", // Make files publicly accessible if needed
+  metadata: (req, file, cb) => {
+    cb(null, { fieldName: file.fieldname });
   },
-  filename: (req: any, file: any, cb: any) => {
-    cb(null, `${Date.now()}_${file.originalname}`);
-  },
-});
-
-const tweetsStorage = multer.diskStorage({
-  destination: (req: any, file: any, cb: any) => {
-    // console.log(req, file);
-    cb(null, "src/public/tweets/");
-  },
-  filename: (req: any, file: any, cb: any) => {
-    cb(null, `${Date.now()}_${file.originalname}`);
+  key: (req, file, cb) => {
+    cb(
+      null,
+      `profile_images/${Date.now()}_${path.basename(file.originalname)}`
+    ); // Save files under 'profile_images' folder in S3
   },
 });
 
+const tweetsStorage = multerS3({
+  s3: s3,
+  bucket: bucket, // Your S3 bucket name
+  acl: "public-read", // Make files publicly accessible if needed
+  metadata: (req, file, cb) => {
+    cb(null, { fieldName: file.fieldname });
+  },
+  key: (req, file, cb) => {
+    cb(null, `tweets_images/${Date.now()}_${path.basename(file.originalname)}`); // Save files under 'tweets_images' folder in S3
+  },
+});
 const upload = multer({ storage: profileStorage }).single("profile_img");
 const uploadTweets = multer({ storage: tweetsStorage }).fields([
   { name: "upload_file" },
@@ -60,19 +64,24 @@ router.post("/", (req: any, res: any) => {
       return res.json({ success: false, err });
     }
 
+    const imageUrl = req.file.location;
     await Users.update(
       {
-        profile: res.req.file.filename,
+        profile: imageUrl,
       },
       {
         where: { email: req.body.id },
       }
     ).then((result: any) => {
-      res.json({
-        success: true,
-        image: res.req.file.path,
-        fileName: res.req.file.filename,
-      });
+      res
+        .json({
+          success: true,
+          image: imageUrl,
+          fileName: res.req.key,
+        })
+        .catch((err: Error) => {
+          res.status(500).json({ success: false, err });
+        });
     });
   });
 });
@@ -85,6 +94,7 @@ router.post(
         console.log(err);
         return res.json({ success: false, err });
       }
+
       await Users.findOne({
         where: { user_id: req.body.id },
       }).then(async (result: any) => {
@@ -93,7 +103,7 @@ router.post(
           email: result.email,
           content: req.body.tweet,
           tag: [req.body.tag],
-          upload_file: res.req.files.upload_file[0].filename,
+          upload_file: res.req.files.upload_file[0].key,
           write_date: sequelize.development.literal(`now()`),
         }).then(async (r) => {
           res.status(201).json(r);
