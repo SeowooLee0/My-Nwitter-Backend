@@ -106,6 +106,8 @@ router.post("/", (req: any, res: any) => {
 
 // 트윗 업로드 라우터
 router.post("/tweets", async (req: any, res: any, next: NextFunction) => {
+  console.log("트윗 업로드 라우터 호출됨");
+
   uploadTweets(req, res, async (err: any) => {
     if (err) {
       console.log(err);
