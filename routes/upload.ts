@@ -4,7 +4,8 @@ import { Tweets } from "../models/tweets";
 import { Users } from "../models/user";
 import sequelize from "../models/index";
 import multerS3 from "multer-s3";
-import AWS from "aws-sdk";
+
+import { PutObjectCommandInput, S3Client } from "@aws-sdk/client-s3";
 import { profile } from "console";
 const fs = require("fs");
 require("dotenv").config();
@@ -18,22 +19,21 @@ const path = require("path");
 
 const router = express.Router();
 
-AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
-  logger: console, // 로깅 활성화
-});
-
-// 이후에 S3, DynamoDB 등의 AWS 서비스 사용
-const s3 = new AWS.S3() as any;
+const s3Client = new S3Client([
+  {
+    region: process.env.AWS_REGION,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+  },
+]);
 
 const bucket = process.env.AWS_S3_BUCKET_NAME as string;
 
-console.log(bucket, s3);
 const profileUpload = multer({
   storage: multerS3({
-    s3: s3,
+    s3: s3Client,
     bucket: bucket, // Your S3 bucket name
     acl: "public-read", // Make files publicly accessible if needed
     metadata: (req, file, cb) => {
@@ -51,7 +51,7 @@ const profileUpload = multer({
 
 const tweetsUpload = multer({
   storage: multerS3({
-    s3: s3,
+    s3: s3Client,
     bucket: bucket, // S3 버킷 이름
     acl: "public-read", // 파일을 공개적으로 접근 가능하도록 설정
     metadata: (req, file, cb) => {
@@ -104,69 +104,91 @@ router.post("/", (req: any, res: any) => {
   });
 });
 
+export const uploadImage = async (req: Request, res: Response) => {
+  const multerFile = req.file as Express.MulterS3.File;
+  const imageURL = multerFile.location;
+  const imageName = multerFile.key;
+  const imageSize = multerFile.size;
+  if (imageURL) {
+    res.status(200);
+    res.json({
+      success: true,
+      imageName: imageName,
+      imageSize: imageSize,
+      imageURL: imageURL,
+    });
+  } else {
+    res.status(400);
+    res.json({
+      success: false,
+    });
+  }
+};
+
 // 트윗 업로드 라우터
-router.post("/tweets", async (req: any, res: any, next: NextFunction) => {
+router.post("/tweets", upload, async (req: Request, res: Response) => {
   console.log("트윗 업로드 라우터 호출됨");
+  uploadImage;
 
-  uploadTweets(req, res, async (err: any) => {
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ success: false, err });
-    }
+  // uploadTweets(req, res, async (err: any) => {
+  //   if (err) {
+  //     console.log(err);
+  //     return res.status(500).json({ success: false, err });
+  //   }
 
-    // 파일 업로드 검증
-    if (
-      !req.files ||
-      !req.files.upload_file ||
-      req.files.upload_file.length === 0
-    ) {
-      return res
-        .status(400)
-        .json({ success: false, message: "No file uploaded" });
-    }
+  //   // 파일 업로드 검증
+  //   if (
+  //     !req.files ||
+  //     !req.files.upload_file ||
+  //     req.files.upload_file.length === 0
+  //   ) {
+  //     return res
+  //       .status(400)
+  //       .json({ success: false, message: "No file uploaded" });
+  //   }
 
-    console.log("파일 업로드 중...");
+  //   console.log("파일 업로드 중...");
 
-    try {
-      // 사용자 ID로 사용자 찾기
-      const user = await Users.findOne({
-        where: { user_id: req.body.id },
-      });
+  //   try {
+  //     // 사용자 ID로 사용자 찾기
+  //     const user = await Users.findOne({
+  //       where: { user_id: req.body.id },
+  //     });
 
-      if (!user) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found" });
-      }
+  //     if (!user) {
+  //       return res
+  //         .status(404)
+  //         .json({ success: false, message: "User not found" });
+  //     }
 
-      // 트윗 데이터베이스에 저장
-      const tweet = await Tweets.create({
-        user_id: user.user_id,
-        email: user.email,
-        content: req.body.tweet, // 트윗 내용
-        tag: [req.body.tag], // 트윗 태그 (배열로 저장)
-        upload_file: req.files.upload_file[0].key, // S3에 저장된 파일 경로
-        write_date: sequelize.development.literal(`now()`), // 트윗 작성 날짜
-      });
+  //     // 트윗 데이터베이스에 저장
+  //     const tweet = await Tweets.create({
+  //       user_id: user.user_id,
+  //       email: user.email,
+  //       content: req.body.tweet, // 트윗 내용
+  //       tag: [req.body.tag], // 트윗 태그 (배열로 저장)
+  //       upload_file: req.files.upload_file[0].key, // S3에 저장된 파일 경로
+  //       write_date: sequelize.development.literal(`now()`), // 트윗 작성 날짜
+  //     });
 
-      // 트윗에 대한 좋아요 초기화
-      await Likes.create({
-        tweet_id: tweet.tweet_id,
-      });
+  //     // 트윗에 대한 좋아요 초기화
+  //     await Likes.create({
+  //       tweet_id: tweet.tweet_id,
+  //     });
 
-      console.log("트윗 업로드 완료");
+  //     console.log("트윗 업로드 완료");
 
-      // 성공적으로 저장된 파일 URL과 함께 응답
-      res.status(200).json({
-        success: true,
-        message: "Tweet uploaded successfully",
-        fileUrl: req.files.upload_file[0].location, // S3에 저장된 파일의 URL
-        tweet,
-      });
-    } catch (err) {
-      console.log("트윗 업로드 실패:", err);
-      res.status(500).json({ success: false, err });
-    }
-  });
+  //     // 성공적으로 저장된 파일 URL과 함께 응답
+  //     res.status(200).json({
+  //       success: true,
+  //       message: "Tweet uploaded successfully",
+  //       fileUrl: req.files.upload_file[0].location, // S3에 저장된 파일의 URL
+  //       tweet,
+  //     });
+  //   } catch (err) {
+  //     console.log("트윗 업로드 실패:", err);
+  //     res.status(500).json({ success: false, err });
+  //   }
+  // });
 });
 module.exports = router;
