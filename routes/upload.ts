@@ -59,6 +59,7 @@ router.post(
   "/",
   tweetUpload.single("profile_img"),
   (req: Request, res: Response) => {
+    console.log(req.file, "여기 실행중", req);
     try {
       console.log(req.file, "여기 실행중"); // 파일 정보 확인
 
@@ -95,7 +96,9 @@ export const uploadImage = async (req: Request, res: Response) => {
 router.post(
   "/tweets",
   tweetUpload.single("profile_img"),
+
   (req: Request, res: Response) => {
+    console.log(req.file, "/tweets여기 실행중", req);
     try {
       console.log(req.file); // 파일 정보 확인
       res.status(200).json({ message: "파일 업로드 성공", file: req.file });
