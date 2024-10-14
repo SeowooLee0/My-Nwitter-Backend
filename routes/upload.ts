@@ -54,36 +54,21 @@ const tweetUpload = multer({
   }),
 });
 
-// 프로필 이미지 업로드 라우터
-router.post("/", (req: any, res: any) => {
-  upload(req, res, async (err: any) => {
-    console.log("여기 실행중임. '/'");
-    if (err) {
-      console.log(err);
-      return res.json({ success: false, err });
-    }
-
+// 트윗 업로드 라우터에서 single("profile_img") 설정
+router.post(
+  "/",
+  tweetUpload.single("profile_img"),
+  (req: Request, res: Response) => {
     try {
-      const imageUrl = req.file.location;
-      await Users.update(
-        {
-          profile: imageUrl,
-        },
-        {
-          where: { email: req.body.id },
-        }
-      );
-      res.json({
-        success: true,
-        image: imageUrl,
-        fileName: req.file.key, // res.req.key 대신 req.file.key 사용
-      });
-    } catch (err) {
-      console.log(err);
-      res.status(500).json({ success: false, err });
+      console.log(req.file, "여기 실행중"); // 파일 정보 확인
+
+      res.status(200).json({ message: "파일 업로드 성공", file: req.file });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "파일 업로드 실패", error });
     }
-  });
-});
+  }
+);
 
 export const uploadImage = async (req: Request, res: Response) => {
   const multerFile = req.file as Express.MulterS3.File;
@@ -106,15 +91,11 @@ export const uploadImage = async (req: Request, res: Response) => {
   }
 };
 
-// 트윗 이미지 업로드 라우터
-router.post("/tweets", (req: Request, res: Response) => {
-  tweetUpload.single("profile_img")(req, res, async (err: any) => {
-    console.log("트윗 이미지 업로드 라우터 호출됨");
-    if (err) {
-      console.log(err);
-      return res.status(500).json({ success: false, err });
-    }
-
+// 트윗 업로드 라우터에서 single("profile_img") 설정
+router.post(
+  "/tweets",
+  tweetUpload.single("profile_img"),
+  (req: Request, res: Response) => {
     try {
       console.log(req.file); // 파일 정보 확인
       res.status(200).json({ message: "파일 업로드 성공", file: req.file });
@@ -122,7 +103,7 @@ router.post("/tweets", (req: Request, res: Response) => {
       console.error(error);
       res.status(500).json({ message: "파일 업로드 실패", error });
     }
-  });
-});
+  }
+);
 
 module.exports = router;
