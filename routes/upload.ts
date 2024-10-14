@@ -18,12 +18,11 @@ const path = require("path");
 
 const router = express.Router();
 
-aws.config.update({
+const s3 = new aws.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: process.env.AWS_REGION,
-});
-const s3 = new aws.S3() as any;
+}) as any;
 const bucket = process.env.AWS_S3_BUCKET_NAME as string;
 
 const profileUpload = multer({
