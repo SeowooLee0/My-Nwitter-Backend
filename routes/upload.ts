@@ -23,8 +23,10 @@ const s3 = new aws.S3({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: process.env.AWS_REGION,
 }) as any;
+
 const bucket = process.env.AWS_S3_BUCKET_NAME as string;
 
+console.log(bucket, s3);
 const profileUpload = multer({
   storage: multerS3({
     s3: s3,
