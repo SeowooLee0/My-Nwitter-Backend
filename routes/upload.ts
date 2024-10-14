@@ -44,7 +44,7 @@ const profileUpload = multer({
 });
 
 const tweetsUpload = multer({
-  Storage: multerS3({
+  storage: multerS3({
     s3: s3,
     bucket: bucket, // Your S3 bucket name
     acl: "public-read", // Make files publicly accessible if needed
