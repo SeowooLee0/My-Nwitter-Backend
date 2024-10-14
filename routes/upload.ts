@@ -71,6 +71,7 @@ const uploadTweets = tweetsUpload.fields([
   { name: "tag" },
 ]);
 
+// 프로필 이미지 업로드 라우터
 router.post("/", (req: any, res: any) => {
   upload(req, res, async (err: any) => {
     if (err) {
@@ -78,66 +79,76 @@ router.post("/", (req: any, res: any) => {
       return res.json({ success: false, err });
     }
 
-    const imageUrl = req.file.location;
-    await Users.update(
-      {
-        profile: imageUrl,
-      },
-      {
-        where: { email: req.body.id },
-      }
-    ).then((result: any) => {
-      res
-        .json({
-          success: true,
-          image: imageUrl,
-          fileName: res.req.key,
-        })
-        .catch((err: Error) => {
-          res.status(500).json({ success: false, err });
-        });
-    });
+    try {
+      const imageUrl = req.file.location;
+      await Users.update(
+        {
+          profile: imageUrl,
+        },
+        {
+          where: { email: req.body.id },
+        }
+      );
+      res.json({
+        success: true,
+        image: imageUrl,
+        fileName: req.file.key, // res.req.key 대신 req.file.key 사용
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ success: false, err });
+    }
   });
 });
 
-router.post(
-  "/tweets",
-  async (req: any, res: any, next: NextFunction) => {
-    uploadTweets(req, res, async (err: any) => {
-      if (err) {
-        console.log(err);
-        return res.json({ success: false, err });
-      }
+// 트윗 업로드 라우터
+router.post("/tweets", async (req: any, res: any, next: NextFunction) => {
+  uploadTweets(req, res, async (err: any) => {
+    if (err) {
+      console.log(err);
+      return res.json({ success: false, err });
+    }
 
-      if (!req.files.upload_file || req.files.upload_file.length === 0) {
-        return res
-          .status(400)
-          .json({ success: false, message: "No file uploaded" });
-      }
+    // 파일 업로드 검증
+    if (!req.files.upload_file || req.files.upload_file.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No file uploaded" });
+    }
 
-      console.log("작동중");
+    console.log("작동중");
 
-      await Users.findOne({
+    try {
+      const user = await Users.findOne({
         where: { user_id: req.body.id },
-      }).then(async (result: any) => {
-        await Tweets.create({
-          user_id: result.user_id,
-          email: result.email,
-          content: req.body.tweet,
-          tag: [req.body.tag],
-          upload_file: res.req.files.upload_file[0].key,
-          write_date: sequelize.development.literal(`now()`),
-        }).then(async (r) => {
-          console.log("작동중", res.req.files);
-          res.status(201).json(r);
-          await Likes.create({
-            tweet_id: r.tweet_id,
-          });
-        });
       });
-    });
-  }
-  // }
-);
+
+      if (!user) {
+        return res
+          .status(404)
+          .json({ success: false, message: "User not found" });
+      }
+
+      const tweet = await Tweets.create({
+        user_id: user.user_id,
+        email: user.email,
+        content: req.body.tweet,
+        tag: [req.body.tag],
+        upload_file: req.files.upload_file[0].key, // res.req.files 대신 req.files
+        write_date: sequelize.development.literal(`now()`),
+      });
+
+      await Likes.create({
+        tweet_id: tweet.tweet_id,
+      });
+
+      console.log("작동중", req.files);
+      res.status(201).json(tweet);
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ success: false, err });
+    }
+  });
+});
 
 module.exports = router;
