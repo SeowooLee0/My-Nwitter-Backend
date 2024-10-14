@@ -4,7 +4,7 @@ import { Tweets } from "../models/tweets";
 import { Users } from "../models/user";
 import sequelize from "../models/index";
 import multerS3 from "multer-s3";
-import aws from "aws-sdk";
+import AWS from "aws-sdk";
 import { profile } from "console";
 const fs = require("fs");
 require("dotenv").config();
@@ -18,11 +18,15 @@ const path = require("path");
 
 const router = express.Router();
 
-const s3 = new aws.S3({
+AWS.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   region: process.env.AWS_REGION,
-}) as any;
+  logger: console, // 로깅 활성화
+});
+
+// 이후에 S3, DynamoDB 등의 AWS 서비스 사용
+const s3 = new AWS.S3() as any;
 
 const bucket = process.env.AWS_S3_BUCKET_NAME as string;
 
