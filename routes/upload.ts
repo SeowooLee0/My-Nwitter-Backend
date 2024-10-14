@@ -107,12 +107,13 @@ router.post(
         return res.json({ success: false, err });
       }
 
-      console.log(req.files);
       if (!req.files.upload_file || req.files.upload_file.length === 0) {
         return res
           .status(400)
           .json({ success: false, message: "No file uploaded" });
       }
+
+      console.log("작동중");
 
       await Users.findOne({
         where: { user_id: req.body.id },
@@ -125,6 +126,7 @@ router.post(
           upload_file: res.req.files.upload_file[0].key,
           write_date: sequelize.development.literal(`now()`),
         }).then(async (r) => {
+          console.log("작동중", res.req.files);
           res.status(201).json(r);
           await Likes.create({
             tweet_id: r.tweet_id,
