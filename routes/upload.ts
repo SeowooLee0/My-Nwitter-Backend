@@ -107,6 +107,13 @@ router.post(
         return res.json({ success: false, err });
       }
 
+      console.log(req.files);
+      if (!req.files.upload_file || req.files.upload_file.length === 0) {
+        return res
+          .status(400)
+          .json({ success: false, message: "No file uploaded" });
+      }
+
       await Users.findOne({
         where: { user_id: req.body.id },
       }).then(async (result: any) => {
