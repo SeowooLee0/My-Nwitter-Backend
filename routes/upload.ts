@@ -147,7 +147,11 @@ router.post("/tweets", async (req: any, res: any, next: NextFunction) => {
       });
 
       console.log("작동중", req.files);
-      res.status(201).json(tweet);
+      res.status(200).json({
+        success: true,
+        message: "File uploaded successfully",
+        fileUrl: req.file.location, // S3에 저장된 파일의 URL
+      });
     } catch (err) {
       console.log(err);
       res.status(500).json({ success: false, err });
